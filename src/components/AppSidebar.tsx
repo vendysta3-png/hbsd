@@ -1,7 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LayoutDashboard, Package, Users, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Users, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +26,7 @@ const navItems = [
 export default function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -57,7 +59,11 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 space-y-1">
+        <Button variant="ghost" className="w-full justify-start" onClick={toggleTheme}>
+          {theme === "light" ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-yellow-400" />}
+          <span>{theme === "light" ? "Mode sombre" : "Mode clair"}</span>
+        </Button>
         <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
           <LogOut className="h-4 w-4 text-red-400" />
           <span>Déconnexion</span>
