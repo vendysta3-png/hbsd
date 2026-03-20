@@ -26,6 +26,7 @@ const navItems = [
 export default function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
