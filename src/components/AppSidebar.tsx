@@ -59,7 +59,11 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 space-y-1">
+        <Button variant="ghost" className="w-full justify-start" onClick={toggleTheme}>
+          {theme === "light" ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-yellow-400" />}
+          <span>{theme === "light" ? "Mode sombre" : "Mode clair"}</span>
+        </Button>
         <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
           <LogOut className="h-4 w-4 text-red-400" />
           <span>Déconnexion</span>
