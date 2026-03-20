@@ -1,7 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LayoutDashboard, Package, Users, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, Users, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/hooks/useTheme";
 import {
   Sidebar,
   SidebarContent,
