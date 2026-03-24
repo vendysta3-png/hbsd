@@ -7,9 +7,11 @@ import DashboardHome from "@/pages/DashboardHome";
 import RetoursPage from "@/pages/RetoursPage";
 import UsersPage from "@/pages/UsersPage";
 import SettingsPage from "@/pages/SettingsPage";
+import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 
 function AppRoutes() {
   const { user, loading } = useAuth();
+  useRealtimeNotifications();
 
   if (loading) {
     return (
