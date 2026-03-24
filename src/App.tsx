@@ -8,6 +8,7 @@ import RetoursPage from "@/pages/RetoursPage";
 import UsersPage from "@/pages/UsersPage";
 import SettingsPage from "@/pages/SettingsPage";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
+import { AnimatedNotificationBox } from "@/components/AnimatedNotification";
 
 function AppRoutes() {
   const { user, loading } = useAuth();
