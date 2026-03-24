@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRetours, useCreateRetour, useUpdateRetour, useDeleteRetour } from "@/hooks/useRetours";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
@@ -21,6 +22,7 @@ export default function RetoursPage() {
   const updateRetour = useUpdateRetour();
   const deleteRetour = useDeleteRetour();
   const [search, setSearch] = useState("");
+  const [filterEtat, setFilterEtat] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -33,11 +35,13 @@ export default function RetoursPage() {
     if (selected) setSelectedRowId(selected);
   }, [searchParams]);
 
-  const filtered = retours.filter((r) =>
-    [r.expediteur, r.emplacement, r.quantite, r.receptionniste, r.etat]
-      .filter(Boolean)
-      .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filtered = retours
+    .filter((r) => filterEtat === "all" || (r.etat || "Disponible") === filterEtat)
+    .filter((r) =>
+      [r.expediteur, r.emplacement, r.quantite, r.receptionniste, r.etat]
+        .filter(Boolean)
+        .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
+    );
 
   const handleExport = () => {
     const ws = XLSX.utils.json_to_sheet(retours);
@@ -70,9 +74,21 @@ export default function RetoursPage() {
         </div>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative max-w-sm flex-1">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+        </div>
+        <Select value={filterEtat} onValueChange={setFilterEtat}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filtrer par état" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les états</SelectItem>
+            <SelectItem value="Disponible">Disponible</SelectItem>
+            <SelectItem value="Retour récupéré">Retour récupéré</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {isLoading ? (
