@@ -21,6 +21,7 @@ export default function RetoursPage() {
   const updateRetour = useUpdateRetour();
   const deleteRetour = useDeleteRetour();
   const [search, setSearch] = useState("");
+  const [filterEtat, setFilterEtat] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
