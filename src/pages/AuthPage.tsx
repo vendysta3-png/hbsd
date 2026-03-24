@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { LogIn, Mail, Lock } from "lucide-react";
 
 export default function AuthPage() {
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,15 +16,9 @@ export default function AuthPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Connexion réussie");
-      } else {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        toast.success("Inscription réussie ! Vérifiez votre email.");
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      toast.success("Connexion réussie");
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -37,7 +30,7 @@ export default function AuthPage() {
     <div className="flex items-center justify-center min-h-screen bg-muted">
       <Card className="w-full max-w-md mx-4">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">{isLogin ? "Connexion" : "Inscription"}</CardTitle>
+          <CardTitle className="text-2xl">Connexion</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -57,14 +50,12 @@ export default function AuthPage() {
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               <LogIn className="h-4 w-4 text-primary-foreground" />
-              {loading ? "Chargement..." : isLogin ? "Se connecter" : "S'inscrire"}
+              {loading ? "Chargement..." : "Se connecter"}
             </Button>
           </form>
-          <div className="mt-4 text-center">
-            <button type="button" className="text-sm text-primary hover:underline" onClick={() => setIsLogin(!isLogin)}>
-              {isLogin ? "Pas de compte ? S'inscrire" : "Déjà un compte ? Se connecter"}
-            </button>
-          </div>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            Contactez un administrateur pour obtenir un compte.
+          </p>
         </CardContent>
       </Card>
     </div>

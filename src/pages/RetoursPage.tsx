@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRetours, useCreateRetour, useUpdateRetour, useDeleteRetour } from "@/hooks/useRetours";
+import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
 import RetourTable from "@/components/RetourTable";
 import RetourForm from "@/components/RetourForm";
@@ -13,6 +14,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
 export default function RetoursPage() {
+  const { isAdmin } = useAuth();
   const { data: retours = [], isLoading } = useRetours();
   const createRetour = useCreateRetour();
   const updateRetour = useUpdateRetour();
@@ -24,7 +26,6 @@ export default function RetoursPage() {
   const [showReceptionnistes, setShowReceptionnistes] = useState(false);
   const [searchParams] = useSearchParams();
 
-  // Auto-select row from URL param (from dashboard click)
   useEffect(() => {
     const selected = searchParams.get("selected");
     if (selected) setSelectedRowId(selected);
@@ -61,9 +62,11 @@ export default function RetoursPage() {
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 text-purple-500" /> Imprimer
           </Button>
-          <Button variant="outline" onClick={() => setShowReceptionnistes(true)}>
-            <Users className="h-4 w-4 text-orange-500" /> Réceptionnistes
-          </Button>
+          {isAdmin && (
+            <Button variant="outline" onClick={() => setShowReceptionnistes(true)}>
+              <Users className="h-4 w-4 text-orange-500" /> Réceptionnistes
+            </Button>
+          )}
         </div>
       </div>
 
