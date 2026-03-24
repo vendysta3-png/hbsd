@@ -6,7 +6,8 @@ import RetourForm from "@/components/RetourForm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, FileDown, Printer } from "lucide-react";
+import { Plus, Search, FileDown, Printer, Users } from "lucide-react";
+import ReceptionnistesManager from "@/components/ReceptionnistesManager";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -20,6 +21,7 @@ export default function RetoursPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [showReceptionnistes, setShowReceptionnistes] = useState(false);
   const [searchParams] = useSearchParams();
 
   // Auto-select row from URL param (from dashboard click)
@@ -59,6 +61,9 @@ export default function RetoursPage() {
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 text-purple-500" /> Imprimer
           </Button>
+          <Button variant="outline" onClick={() => setShowReceptionnistes(true)}>
+            <Users className="h-4 w-4 text-orange-500" /> Réceptionnistes
+          </Button>
         </div>
       </div>
 
@@ -81,6 +86,15 @@ export default function RetoursPage() {
           onStatusChange={(id, etat) => updateRetour.mutate({ id, etat, date_retour_recupere: etat === "Retour récupéré" ? new Date().toISOString() : null })}
         />
       )}
+
+      <Dialog open={showReceptionnistes} onOpenChange={setShowReceptionnistes}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Gérer les réceptionnistes</DialogTitle>
+          </DialogHeader>
+          <ReceptionnistesManager />
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent>
