@@ -57,7 +57,7 @@ export default function RetoursPage() {
             <Plus className="h-4 w-4" /> Nouveau
           </Button>
           <Button variant="outline" onClick={handleExport}>
-            <FileDown className="h-4 w-4 text-green-500" /> Excel
+            <FileDown className="h-4 w-4 text-status-available" /> Excel
           </Button>
           <Button variant="outline" onClick={() => setShowPrint(true)}>
             <Printer className="h-4 w-4 text-primary" /> Imprimer
