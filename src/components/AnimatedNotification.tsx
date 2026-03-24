@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Package, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import notificationSound from "@/assets/notification.wav";
 
 interface NotificationData {
   id: string;
@@ -19,8 +20,16 @@ export function triggerNotification(data: NotificationData) {
 export function AnimatedNotificationBox() {
   const [notifications, setNotifications] = useState<(NotificationData & { visible: boolean })[]>([]);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio(notificationSound);
+    audioRef.current.volume = 0.5;
+  }, []);
+
   useEffect(() => {
     notifyFn = (data) => {
+      audioRef.current?.play().catch(() => {});
       const entry = { ...data, visible: true };
       setNotifications((prev) => [...prev, entry]);
       setTimeout(() => {
