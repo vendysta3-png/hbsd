@@ -55,7 +55,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
               >
                 <TableCell className="text-xs">{format(new Date(r.date_heure_saisie), "dd/MM/yyyy HH:mm", { locale: fr })}</TableCell>
                 <TableCell className="font-medium">{r.expediteur}</TableCell>
-                <TableCell>{r.nombre_sacs ?? 1}</TableCell>
+                <TableCell>{r.nombre_sacs === -1 ? "GC" : (r.nombre_sacs ?? 1)}</TableCell>
                 <TableCell>{r.quantite}</TableCell>
                 <TableCell>{r.emplacement}</TableCell>
                 <TableCell>{r.receptionniste || "—"}</TableCell>
