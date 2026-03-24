@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      receptionnistes: {
+        Row: {
+          created_at: string | null
+          id: string
+          nom: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nom: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nom?: string
+        }
+        Relationships: []
+      }
       retours_colis: {
         Row: {
           created_at: string | null

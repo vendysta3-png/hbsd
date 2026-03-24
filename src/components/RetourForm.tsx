@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useReceptionnistes } from "@/hooks/useReceptionnistes";
 
 interface Props {
   initialData?: any;
@@ -18,6 +19,7 @@ function toLocalDatetime(iso: string | null | undefined): string {
 }
 
 export default function RetourForm({ initialData, onSubmit }: Props) {
+  const { data: receptionnistes = [] } = useReceptionnistes();
   const [form, setForm] = useState({
     date_heure_saisie: initialData?.date_heure_saisie
       ? toLocalDatetime(initialData.date_heure_saisie)
@@ -77,7 +79,19 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Réceptionniste</Label>
-        <Input value={form.receptionniste} onChange={(e) => setForm({ ...form, receptionniste: e.target.value })} />
+        <Select
+          value={form.receptionniste}
+          onValueChange={(v) => setForm({ ...form, receptionniste: v })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionner un réceptionniste" />
+          </SelectTrigger>
+          <SelectContent>
+            {receptionnistes.map((r) => (
+              <SelectItem key={r.id} value={r.nom}>{r.nom}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-2">
         <Label>État</Label>
