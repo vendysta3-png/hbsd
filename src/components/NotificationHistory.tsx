@@ -10,6 +10,7 @@ interface RecoveredRetour {
   expediteur: string;
   quantite: string;
   emplacement: string;
+  receptionniste: string | null;
   date_retour_recupere: string;
 }
 
@@ -20,7 +21,7 @@ export default function NotificationHistory({ open, onOpenChange }: { open: bool
     if (!open) return;
     supabase
       .from("retours_colis")
-      .select("id, expediteur, quantite, emplacement, date_retour_recupere")
+      .select("id, expediteur, quantite, emplacement, receptionniste, date_retour_recupere")
       .eq("etat", "Retour récupéré")
       .not("date_retour_recupere", "is", null)
       .order("date_retour_recupere", { ascending: false })
@@ -54,6 +55,11 @@ export default function NotificationHistory({ open, onOpenChange }: { open: bool
                   <p className="text-xs text-muted-foreground">
                     {item.quantite} colis · {item.emplacement}
                   </p>
+                  {item.receptionniste && (
+                    <p className="text-xs text-primary font-medium">
+                      Réceptionniste : {item.receptionniste}
+                    </p>
+                  )}
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {format(new Date(item.date_retour_recupere), "dd/MM/yyyy à HH:mm", { locale: fr })}
                   </p>
