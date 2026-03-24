@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { triggerNotification } from "@/components/AnimatedNotification";
 
 export function useRealtimeNotifications() {
   useEffect(() => {
@@ -11,9 +11,12 @@ export function useRealtimeNotifications() {
         { event: "INSERT", schema: "public", table: "retours_colis" },
         (payload) => {
           const r = payload.new as any;
-          toast.info(`Nouveau retour : ${r.expediteur} — ${r.quantite} colis`, {
-            description: `Emplacement: ${r.emplacement}`,
-            duration: 5000,
+          triggerNotification({
+            id: r.id,
+            expediteur: r.expediteur,
+            quantite: r.quantite,
+            emplacement: r.emplacement,
+            etat: r.etat || "Disponible",
           });
         }
       )
