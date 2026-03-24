@@ -9,29 +9,54 @@ interface Props {
   onSubmit: (data: any) => void;
 }
 
+function toLocalDatetime(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const offset = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - offset * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
 export default function RetourForm({ initialData, onSubmit }: Props) {
   const [form, setForm] = useState({
+    date_heure_saisie: initialData?.date_heure_saisie
+      ? toLocalDatetime(initialData.date_heure_saisie)
+      : toLocalDatetime(new Date().toISOString()),
     expediteur: initialData?.expediteur || "",
     quantite: initialData?.quantite || "",
     emplacement: initialData?.emplacement || "",
     receptionniste: initialData?.receptionniste || "",
     nombre_sacs: initialData?.nombre_sacs || 1,
     etat: initialData?.etat || "Disponible",
+    date_retour_recupere: initialData?.date_retour_recupere
+      ? toLocalDatetime(initialData.date_retour_recupere)
+      : "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data: any = { ...form };
-    if (form.etat === "Retour récupéré" && !initialData?.date_retour_recupere) {
-      data.date_retour_recupere = new Date().toISOString();
-    } else if (form.etat === "Disponible") {
-      data.date_retour_recupere = null;
-    }
+    const data: any = {
+      ...form,
+      date_heure_saisie: new Date(form.date_heure_saisie).toISOString(),
+      date_retour_recupere:
+        form.etat === "Retour récupéré" && form.date_retour_recupere
+          ? new Date(form.date_retour_recupere).toISOString()
+          : null,
+    };
     onSubmit(data);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label>Date de saisie</Label>
+        <Input
+          type="datetime-local"
+          value={form.date_heure_saisie}
+          onChange={(e) => setForm({ ...form, date_heure_saisie: e.target.value })}
+          required
+        />
+      </div>
       <div className="space-y-2">
         <Label>Expéditeur</Label>
         <Input value={form.expediteur} onChange={(e) => setForm({ ...form, expediteur: e.target.value })} required />
@@ -56,7 +81,21 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
       </div>
       <div className="space-y-2">
         <Label>État</Label>
-        <Select value={form.etat} onValueChange={(v) => setForm({ ...form, etat: v })}>
+        <Select
+          value={form.etat}
+          onValueChange={(v) =>
+            setForm({
+              ...form,
+              etat: v,
+              date_retour_recupere:
+                v === "Retour récupéré" && !form.date_retour_recupere
+                  ? toLocalDatetime(new Date().toISOString())
+                  : v === "Disponible"
+                  ? ""
+                  : form.date_retour_recupere,
+            })
+          }
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -66,6 +105,17 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
           </SelectContent>
         </Select>
       </div>
+      {form.etat === "Retour récupéré" && (
+        <div className="space-y-2">
+          <Label>Date de récupération</Label>
+          <Input
+            type="datetime-local"
+            value={form.date_retour_recupere}
+            onChange={(e) => setForm({ ...form, date_retour_recupere: e.target.value })}
+            required
+          />
+        </div>
+      )}
       <Button type="submit" className="w-full">
         {initialData ? "Mettre à jour" : "Enregistrer"}
       </Button>

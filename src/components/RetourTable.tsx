@@ -24,13 +24,14 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Date</TableHead>
+          <TableHead>Date saisie</TableHead>
           <TableHead>Expéditeur</TableHead>
           <TableHead>Sacs</TableHead>
           <TableHead>Quantité</TableHead>
           <TableHead>Emplacement</TableHead>
           <TableHead>Réceptionniste</TableHead>
           <TableHead>État</TableHead>
+          <TableHead>Date récupéré</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -56,6 +57,11 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                 <Package className="h-3 w-3" />
                 {r.etat || "Disponible"}
               </span>
+            </TableCell>
+            <TableCell>
+              {r.etat === "Retour récupéré" && r.date_retour_recupere
+                ? format(new Date(r.date_retour_recupere), "dd/MM/yyyy HH:mm", { locale: fr })
+                : "—"}
             </TableCell>
             <TableCell>
               <div className="flex gap-1">
