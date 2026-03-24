@@ -100,7 +100,7 @@ export default function RetoursPage() {
       </Dialog>
 
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent>
+        <DialogContent className="max-w-lg w-full mx-auto max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingRetour ? "Modifier le retour" : "Nouveau retour"}</DialogTitle>
           </DialogHeader>
