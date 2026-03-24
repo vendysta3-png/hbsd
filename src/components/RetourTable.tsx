@@ -24,13 +24,14 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Date</TableHead>
+          <TableHead>Date saisie</TableHead>
           <TableHead>Expéditeur</TableHead>
           <TableHead>Sacs</TableHead>
           <TableHead>Quantité</TableHead>
           <TableHead>Emplacement</TableHead>
           <TableHead>Réceptionniste</TableHead>
           <TableHead>État</TableHead>
+          <TableHead>Date récupéré</TableHead>
           <TableHead>Actions</TableHead>
         </TableRow>
       </TableHeader>
