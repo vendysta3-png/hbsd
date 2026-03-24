@@ -110,10 +110,6 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Quantité</Label>
-          <Input value={form.quantite} onChange={(e) => setForm({ ...form, quantite: e.target.value })} required />
-        </div>
-        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label>{form.grands_colis ? "Grands colis" : "Nombre de sacs"}</Label>
             <label className="flex items-center gap-1.5 cursor-pointer text-xs">
@@ -137,6 +133,10 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
               onChange={(e) => setForm({ ...form, nombre_sacs: parseInt(e.target.value) || 1 })}
             />
           )}
+        </div>
+        <div className="space-y-2">
+          <Label>Quantité</Label>
+          <Input value={form.quantite} onChange={(e) => setForm({ ...form, quantite: e.target.value })} required />
         </div>
       </div>
 
