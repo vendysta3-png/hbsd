@@ -33,13 +33,11 @@ export default function NotificationHistory({ open, onOpenChange }: { open: bool
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-[380px] sm:w-[420px] overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5 text-primary" />
-            Historique des récupérations
-          </SheetTitle>
-        </SheetHeader>
-        <div className="mt-4 space-y-2">
+        <div className="flex items-center gap-2 mb-4 pt-2">
+          <Package className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-semibold">Historique des récupérations</h2>
+        </div>
+        <div className="space-y-2">
           {items.length === 0 ? (
             <p className="text-muted-foreground text-center py-8 text-sm">Aucune récupération enregistrée</p>
           ) : (
