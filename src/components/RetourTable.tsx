@@ -50,19 +50,12 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
             <TableCell>{r.emplacement}</TableCell>
             <TableCell>{r.receptionniste || "—"}</TableCell>
             <TableCell>
-              <Select value={r.etat || "Disponible"} onValueChange={(v) => { onStatusChange(r.id, v); }}>
-                <SelectTrigger className="w-[140px]" onClick={(e) => e.stopPropagation()}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Disponible">
-                    <span className="flex items-center gap-1"><Package className="h-3 w-3 text-green-500" /> Disponible</span>
-                  </SelectItem>
-                  <SelectItem value="Retour récupéré">
-                    <span className="flex items-center gap-1"><Package className="h-3 w-3 text-blue-500" /> Récupéré</span>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                r.etat === "Retour récupéré" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300" : "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300"
+              }`}>
+                <Package className="h-3 w-3" />
+                {r.etat || "Disponible"}
+              </span>
             </TableCell>
             <TableCell>
               <div className="flex gap-1">
