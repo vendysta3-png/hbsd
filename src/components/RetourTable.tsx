@@ -59,6 +59,10 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
               </span>
             </TableCell>
             <TableCell>
+              {r.etat === "Retour récupéré" && r.date_retour_recupere
+                ? format(new Date(r.date_retour_recupere), "dd/MM/yyyy HH:mm", { locale: fr })
+                : "—"}
+            <TableCell>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(r); }}>
                   <Pencil className="h-4 w-4 text-blue-500" />
