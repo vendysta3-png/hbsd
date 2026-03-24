@@ -3,19 +3,26 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 type Theme = "light" | "dark";
 
 const ThemeContext = createContext<{ theme: Theme; toggleTheme: () => void }>({
-  theme: "light",
+  theme: "dark",
   toggleTheme: () => {},
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const stored = localStorage.getItem("theme") as Theme;
-    return stored || "light";
+    return stored || "dark";
   });
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
     localStorage.setItem("theme", theme);
+
+    // Restore accent color
+    const savedColor = localStorage.getItem("accent-color");
+    if (savedColor) {
+      document.documentElement.style.setProperty("--primary", savedColor);
+      document.documentElement.style.setProperty("--ring", savedColor);
+    }
   }, [theme]);
 
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));

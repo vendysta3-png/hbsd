@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
 import RetourTable from "@/components/RetourTable";
 import RetourForm from "@/components/RetourForm";
+import PrintDialog from "@/components/PrintDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -24,6 +25,7 @@ export default function RetoursPage() {
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [showReceptionnistes, setShowReceptionnistes] = useState(false);
+  const [showPrint, setShowPrint] = useState(false);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -46,32 +48,30 @@ export default function RetoursPage() {
     toast.success("Export Excel réussi");
   };
 
-  const handlePrint = () => window.print();
-
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">Liste des retours</h1>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => { setEditingRetour(null); setShowForm(true); }}>
-            <Plus className="h-4 w-4 text-primary-foreground" /> Nouveau
+            <Plus className="h-4 w-4" /> Nouveau
           </Button>
           <Button variant="outline" onClick={handleExport}>
-            <FileDown className="h-4 w-4 text-green-500" /> Excel
+            <FileDown className="h-4 w-4 text-status-available" /> Excel
           </Button>
-          <Button variant="outline" onClick={handlePrint}>
-            <Printer className="h-4 w-4 text-purple-500" /> Imprimer
+          <Button variant="outline" onClick={() => setShowPrint(true)}>
+            <Printer className="h-4 w-4 text-primary" /> Imprimer
           </Button>
           {isAdmin && (
             <Button variant="outline" onClick={() => setShowReceptionnistes(true)}>
-              <Users className="h-4 w-4 text-orange-500" /> Réceptionnistes
+              <Users className="h-4 w-4 text-primary" /> Réceptionnistes
             </Button>
           )}
         </div>
       </div>
 
       <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-blue-500" />
+        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
       </div>
 
@@ -90,11 +90,11 @@ export default function RetoursPage() {
         />
       )}
 
+      <PrintDialog open={showPrint} onOpenChange={setShowPrint} retours={filtered} />
+
       <Dialog open={showReceptionnistes} onOpenChange={setShowReceptionnistes}>
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Gérer les réceptionnistes</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Gérer les réceptionnistes</DialogTitle></DialogHeader>
           <ReceptionnistesManager />
         </DialogContent>
       </Dialog>
