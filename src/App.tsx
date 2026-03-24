@@ -38,6 +38,7 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
+      <AnimatedNotificationBox />
       <Toaster />
       <AppRoutes />
     </AuthProvider>
