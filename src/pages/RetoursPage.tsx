@@ -34,11 +34,13 @@ export default function RetoursPage() {
     if (selected) setSelectedRowId(selected);
   }, [searchParams]);
 
-  const filtered = retours.filter((r) =>
-    [r.expediteur, r.emplacement, r.quantite, r.receptionniste, r.etat]
-      .filter(Boolean)
-      .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filtered = retours
+    .filter((r) => filterEtat === "all" || (r.etat || "Disponible") === filterEtat)
+    .filter((r) =>
+      [r.expediteur, r.emplacement, r.quantite, r.receptionniste, r.etat]
+        .filter(Boolean)
+        .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
+    );
 
   const handleExport = () => {
     const ws = XLSX.utils.json_to_sheet(retours);
