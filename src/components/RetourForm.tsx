@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Props {
   initialData?: any;
@@ -15,11 +16,18 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
     emplacement: initialData?.emplacement || "",
     receptionniste: initialData?.receptionniste || "",
     nombre_sacs: initialData?.nombre_sacs || 1,
+    etat: initialData?.etat || "Disponible",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(form);
+    const data: any = { ...form };
+    if (form.etat === "Retour récupéré" && !initialData?.date_retour_recupere) {
+      data.date_retour_recupere = new Date().toISOString();
+    } else if (form.etat === "Disponible") {
+      data.date_retour_recupere = null;
+    }
+    onSubmit(data);
   };
 
   return (
@@ -45,6 +53,18 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
       <div className="space-y-2">
         <Label>Réceptionniste</Label>
         <Input value={form.receptionniste} onChange={(e) => setForm({ ...form, receptionniste: e.target.value })} />
+      </div>
+      <div className="space-y-2">
+        <Label>État</Label>
+        <Select value={form.etat} onValueChange={(v) => setForm({ ...form, etat: v })}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Disponible">Disponible</SelectItem>
+            <SelectItem value="Retour récupéré">Retour récupéré</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       <Button type="submit" className="w-full">
         {initialData ? "Mettre à jour" : "Enregistrer"}
