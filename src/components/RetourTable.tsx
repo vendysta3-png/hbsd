@@ -58,7 +58,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                   <SelectItem value="Disponible">
                     <span className="flex items-center gap-1"><Package className="h-3 w-3 text-green-500" /> Disponible</span>
                   </SelectItem>
-                  <SelectItem value="Récupéré">
+                  <SelectItem value="Retour récupéré">
                     <span className="flex items-center gap-1"><Package className="h-3 w-3 text-blue-500" /> Récupéré</span>
                   </SelectItem>
                 </SelectContent>

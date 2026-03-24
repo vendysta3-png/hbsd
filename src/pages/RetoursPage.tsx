@@ -78,7 +78,7 @@ export default function RetoursPage() {
           onDelete={(id) => {
             if (window.confirm("Supprimer ce retour ?")) deleteRetour.mutate(id);
           }}
-          onStatusChange={(id, etat) => updateRetour.mutate({ id, etat, date_retour_recupere: etat === "Récupéré" ? new Date().toISOString() : null })}
+          onStatusChange={(id, etat) => updateRetour.mutate({ id, etat, date_retour_recupere: etat === "Retour récupéré" ? new Date().toISOString() : null })}
         />
       )}
 
