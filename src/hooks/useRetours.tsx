@@ -12,6 +12,7 @@ export function useRetours() {
       const { data, error } = await supabase
         .from("retours_colis")
         .select("*")
+        .eq("archived", false)
         .order("date_heure_saisie", { ascending: false });
       if (error) throw error;
       return data as Retour[];
@@ -55,12 +56,59 @@ export function useDeleteRetour() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("retours_colis").delete().eq("id", id);
+      const { error } = await supabase.from("retours_colis").update({ archived: true }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["retours"] });
-      toast.success("Retour supprimé");
+      qc.invalidateQueries({ queryKey: ["archived-retours"] });
+      toast.success("Retour archivé");
+    },
+    onError: (e: any) => toast.error("Erreur: " + e.message),
+  });
+}
+
+export function useArchivedRetours() {
+  return useQuery({
+    queryKey: ["archived-retours"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("retours_colis")
+        .select("*")
+        .eq("archived", true)
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return data as Retour[];
+    },
+  });
+}
+
+export function useRestoreRetour() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("retours_colis").update({ archived: false }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["retours"] });
+      qc.invalidateQueries({ queryKey: ["archived-retours"] });
+      toast.success("Retour restauré");
+    },
+    onError: (e: any) => toast.error("Erreur: " + e.message),
+  });
+}
+
+export function usePermanentDeleteRetour() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("retours_colis").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["archived-retours"] });
+      toast.success("Retour supprimé définitivement");
     },
     onError: (e: any) => toast.error("Erreur: " + e.message),
   });
