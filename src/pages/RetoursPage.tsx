@@ -11,7 +11,7 @@ import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Plus, Search, Printer, Users, Upload, AlertTriangle, Clock, ChevronDown } from "lucide-react";
+import { Plus, Search, Printer, Users, Upload, AlertTriangle } from "lucide-react";
 import { differenceInDays } from "date-fns";
 import ReceptionnistesManager from "@/components/ReceptionnistesManager";
 import ExportMenu from "@/components/ExportMenu";
@@ -20,7 +20,7 @@ import { toast } from "sonner";
 
 export default function RetoursPage() {
   const { isAdmin } = useAuth();
-  const [overdueExpanded, setOverdueExpanded] = useState(false);
+  
   const { data: retours = [], isLoading } = useRetours();
   const createRetour = useCreateRetour();
   const updateRetour = useUpdateRetour();
@@ -51,9 +51,6 @@ export default function RetoursPage() {
         .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
     );
 
-  const overdueRetours = retours.filter(
-    (r) => (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7
-  );
 
   // Export is handled by ExportMenu component
 
