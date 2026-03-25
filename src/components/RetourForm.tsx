@@ -66,6 +66,7 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
     expediteur: initialData?.expediteur || "",
     quantite: initialData?.quantite || "",
     emplacementBase: parsedEmp.base,
+    emplacementNum: parsedEmp.num,
     receptionniste: initialData?.receptionniste || "",
     nombre_sacs: isGC ? 1 : (initialData?.nombre_sacs || 1),
     grands_colis: isGC,
@@ -89,7 +90,7 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
       date_heure_saisie: new Date(form.date_heure_saisie).toISOString(),
       expediteur: form.expediteur,
       quantite: form.quantite,
-      emplacement: buildEmplacement(form.emplacementBase, form.zones),
+      emplacement: buildEmplacement(form.emplacementBase, form.emplacementNum, form.zones),
       receptionniste: form.receptionniste,
       nombre_sacs: form.grands_colis ? -1 : form.nombre_sacs,
       etat: form.etat,
@@ -159,7 +160,7 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
         <Label>Emplacement</Label>
         <Select
           value={form.emplacementBase}
-          onValueChange={(v) => setForm({ ...form, emplacementBase: v })}
+          onValueChange={(v) => setForm({ ...form, emplacementBase: v, emplacementNum: LETTERS.includes(v) ? form.emplacementNum : "" })}
         >
           <SelectTrigger>
             <SelectValue placeholder="Sélectionner (1-50 ou A-Z)" />
@@ -170,6 +171,25 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
             ))}
           </SelectContent>
         </Select>
+        <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="space-y-1">
+            <Label className={!LETTERS.includes(form.emplacementBase) ? "opacity-50" : ""}>Num</Label>
+            <Select
+              value={form.emplacementNum}
+              onValueChange={(v) => setForm({ ...form, emplacementNum: v })}
+              disabled={!LETTERS.includes(form.emplacementBase)}
+            >
+              <SelectTrigger className={!LETTERS.includes(form.emplacementBase) ? "opacity-50" : ""}>
+                <SelectValue placeholder="Num" />
+              </SelectTrigger>
+              <SelectContent>
+                {NUM_OPTIONS.map((n) => (
+                  <SelectItem key={n} value={n}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <div className="flex flex-wrap gap-3 mt-2">
           {ZONES.map((zone) => (
             <label key={zone} className={`flex items-center gap-1.5 text-sm ${form.grands_colis ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
@@ -186,7 +206,7 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
         </div>
         {(form.emplacementBase || form.zones.length > 0) && (
           <p className="text-xs text-muted-foreground mt-1">
-            Résultat : <span className="font-medium text-foreground">{buildEmplacement(form.emplacementBase, form.zones)}</span>
+            Résultat : <span className="font-medium text-foreground">{buildEmplacement(form.emplacementBase, form.emplacementNum, form.zones)}</span>
           </p>
         )}
       </div>
