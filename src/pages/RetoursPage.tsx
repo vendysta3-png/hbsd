@@ -80,6 +80,33 @@ export default function RetoursPage() {
             <SelectItem value="Retour récupéré">Retour récupéré</SelectItem>
           </SelectContent>
         </Select>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !dateFrom && "text-muted-foreground")}>
+              <CalendarIcon className="mr-1 h-4 w-4" />
+              {dateFrom ? format(dateFrom, "dd/MM/yyyy") : "Date début"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={fr} initialFocus className="p-3 pointer-events-auto" />
+          </PopoverContent>
+        </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !dateTo && "text-muted-foreground")}>
+              <CalendarIcon className="mr-1 h-4 w-4" />
+              {dateTo ? format(dateTo, "dd/MM/yyyy") : "Date fin"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={fr} initialFocus className="p-3 pointer-events-auto" />
+          </PopoverContent>
+        </Popover>
+        {(dateFrom || dateTo) && (
+          <Button variant="ghost" size="icon" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }} title="Réinitialiser les dates">
+            <X className="h-4 w-4" />
+          </Button>
+        )}
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => { setEditingRetour(null); setShowForm(true); }}>
             <Plus className="h-4 w-4" /> Nouveau
