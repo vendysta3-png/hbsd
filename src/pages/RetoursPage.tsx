@@ -10,8 +10,8 @@ import PrintDialog from "@/components/PrintDialog";
 import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, Printer, Users, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Plus, Search, Printer, Users, Upload, AlertTriangle } from "lucide-react";
 import ReceptionnistesManager from "@/components/ReceptionnistesManager";
 import ExportMenu from "@/components/ExportMenu";
 import ImportDialog from "@/components/ImportDialog";
@@ -33,6 +33,7 @@ export default function RetoursPage() {
   const [showImport, setShowImport] = useState(false);
   const [showPrint, setShowPrint] = useState(false);
   const [historyRetour, setHistoryRetour] = useState<any>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -94,16 +95,7 @@ export default function RetoursPage() {
           selectedRowId={selectedRowId}
           onSelectRow={(id) => setSelectedRowId(selectedRowId === id ? null : id)}
           onEdit={(r) => { setEditingRetour(r); setShowForm(true); }}
-          onDelete={(id) => {
-            if (window.confirm("Supprimer ce retour ?")) {
-              const retour = retours.find(r => r.id === id);
-              deleteRetour.mutate(id, {
-                onSuccess: () => {
-                  logAction.mutate({ retour_id: id, action: "suppression", details: { expediteur: retour?.expediteur } });
-                }
-              });
-            }
-          }}
+          onDelete={(id) => setDeleteConfirmId(id)}
           onStatusChange={(id, etat) => {
             const retour = retours.find(r => r.id === id);
             updateRetour.mutate(
@@ -167,6 +159,41 @@ export default function RetoursPage() {
         retourId={historyRetour?.id || null}
         expediteur={historyRetour?.expediteur}
       />
+
+      <Dialog open={!!deleteConfirmId} onOpenChange={(v) => { if (!v) setDeleteConfirmId(null); }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              Confirmer la suppression
+            </DialogTitle>
+            <DialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce retour ? Cette action est irréversible.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Annuler</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (deleteConfirmId) {
+                  const retour = retours.find(r => r.id === deleteConfirmId);
+                  deleteRetour.mutate(deleteConfirmId, {
+                    onSuccess: () => {
+                      logAction.mutate({ retour_id: deleteConfirmId, action: "suppression", details: { expediteur: retour?.expediteur } });
+                    }
+                  });
+                  setDeleteConfirmId(null);
+                }
+              }}
+            >
+              Supprimer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <ImportDialog open={showImport} onOpenChange={setShowImport} />
     </div>
