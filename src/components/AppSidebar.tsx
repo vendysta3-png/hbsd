@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { LayoutDashboard, Package, Users, Settings, Database, LogOut, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useBranding } from "@/hooks/useBranding";
+import { useRetours } from "@/hooks/useRetours";
+import { differenceInDays } from "date-fns";
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +35,11 @@ export default function AppSidebar() {
   const { appName, logoUrl } = useBranding();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const { data: retours = [] } = useRetours();
+
+  const overdueCount = retours.filter(
+    (r) => (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7
+  ).length;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -61,7 +68,14 @@ export default function AppSidebar() {
                     isActive={location.pathname === item.url}
                     className="cursor-pointer"
                   >
-                    <item.icon className={`h-4 w-4 ${item.iconColor}`} />
+                    <div className="relative">
+                      <item.icon className={`h-4 w-4 ${item.iconColor}`} />
+                      {item.url === "/" && overdueCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
+                          {overdueCount > 9 ? "9+" : overdueCount}
+                        </span>
+                      )}
+                    </div>
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
