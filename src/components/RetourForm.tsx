@@ -204,20 +204,6 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
             </Select>
           </div>
         </div>
-        <div className="flex flex-wrap gap-3 mt-2">
-          {ZONES.map((zone) => (
-            <label key={zone} className={`flex items-center gap-1.5 text-sm ${form.grands_colis ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
-              <input
-                type="checkbox"
-                checked={form.zones.includes(zone)}
-                onChange={() => handleZoneToggle(zone)}
-                disabled={!form.grands_colis}
-                className="rounded border-border accent-primary h-4 w-4"
-              />
-              <span className="text-foreground">{zone}</span>
-            </label>
-          ))}
-        </div>
         {(form.emplacementBase || form.zones.length > 0) && (
           <p className="text-xs text-muted-foreground mt-1">
             Résultat : <span className="font-medium text-foreground">{buildEmplacement(form.emplacementBase, form.emplacementNum, form.zones)}</span>
