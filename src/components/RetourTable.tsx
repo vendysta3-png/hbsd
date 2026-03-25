@@ -61,7 +61,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
               {paginated.map((r) => (
                 <TableRow
                   key={r.id}
-                  className={`cursor-pointer transition-colors ${
+                  className={`cursor-pointer transition-colors h-10 ${
                     selectedRowId === r.id ? "bg-primary/10" : "hover:bg-muted/50"
                   }`}
                   onClick={() => onSelectRow(r.id)}
