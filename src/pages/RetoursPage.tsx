@@ -20,6 +20,7 @@ import { toast } from "sonner";
 
 export default function RetoursPage() {
   const { isAdmin } = useAuth();
+  const [overdueExpanded, setOverdueExpanded] = useState(false);
   const { data: retours = [], isLoading } = useRetours();
   const createRetour = useCreateRetour();
   const updateRetour = useUpdateRetour();
