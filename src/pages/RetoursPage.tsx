@@ -171,6 +171,8 @@ export default function RetoursPage() {
         retourId={historyRetour?.id || null}
         expediteur={historyRetour?.expediteur}
       />
+
+      <ImportDialog open={showImport} onOpenChange={setShowImport} />
     </div>
   );
 }
