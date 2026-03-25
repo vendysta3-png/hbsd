@@ -30,6 +30,7 @@ export default function RetoursPage() {
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [showReceptionnistes, setShowReceptionnistes] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [showPrint, setShowPrint] = useState(false);
   const [historyRetour, setHistoryRetour] = useState<any>(null);
   const [searchParams] = useSearchParams();
@@ -47,14 +48,7 @@ export default function RetoursPage() {
         .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
     );
 
-  const handleExport = () => {
-    const ws = XLSX.utils.json_to_sheet(retours);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Retours");
-    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    saveAs(new Blob([buf]), "retours.xlsx");
-    toast.success("Export Excel réussi");
-  };
+  // Export is handled by ExportMenu component
 
   return (
     <div className="space-y-4">
