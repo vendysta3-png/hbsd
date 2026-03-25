@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { LayoutDashboard, Package, Users, Settings, Database, LogOut, Sun, Moon, Archive } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import { useBranding } from "@/hooks/useBranding";
-import { useRetours } from "@/hooks/useRetours";
+import { useRetours, useArchivedRetours } from "@/hooks/useRetours";
 import { differenceInDays } from "date-fns";
 import {
   Sidebar,
@@ -37,10 +37,12 @@ export default function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { data: retours = [] } = useRetours();
+  const { data: archivedRetours = [] } = useArchivedRetours();
 
   const overdueCount = retours.filter(
     (r) => (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7
   ).length;
+  const archivedCount = archivedRetours.length;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -74,6 +76,11 @@ export default function AppSidebar() {
                       {item.url === "/" && overdueCount > 0 && (
                         <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
                           {overdueCount > 9 ? "9+" : overdueCount}
+                        </span>
+                      )}
+                      {item.url === "/archived" && archivedCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 flex h-4 w-auto min-w-[14px] px-1 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground">
+                          {archivedCount > 99 ? "99+" : archivedCount}
                         </span>
                       )}
                     </div>
