@@ -43,18 +43,17 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
     <div className="space-y-3">
       <div className="rounded-lg border overflow-hidden">
         <ScrollArea className="h-[60vh]" type="always">
-          <div className="min-w-[900px]">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 sticky top-0 z-10">
-                <TableHead>Date saisie</TableHead>
                 <TableHead>Expéditeur</TableHead>
-                <TableHead>Sacs</TableHead>
+                <TableHead className="hidden sm:table-cell">Date saisie</TableHead>
+                <TableHead className="hidden lg:table-cell">Sacs</TableHead>
                 <TableHead>Quantité</TableHead>
-                <TableHead>Emplacement</TableHead>
-                <TableHead>Réceptionniste</TableHead>
+                <TableHead className="hidden md:table-cell">Emplacement</TableHead>
+                <TableHead className="hidden xl:table-cell">Réceptionniste</TableHead>
                 <TableHead>État</TableHead>
-                <TableHead>Date récupéré</TableHead>
+                <TableHead className="hidden lg:table-cell">Date récupéré</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -67,12 +66,12 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                   }`}
                   onClick={() => onSelectRow(r.id)}
                 >
-                  <TableCell className="text-xs">{format(new Date(r.date_heure_saisie), "dd/MM/yyyy HH:mm", { locale: fr })}</TableCell>
                   <TableCell className="font-medium">{r.expediteur}</TableCell>
-                  <TableCell>{r.nombre_sacs === -1 ? "GC" : (r.nombre_sacs ?? 1)}</TableCell>
+                  <TableCell className="text-xs hidden sm:table-cell">{format(new Date(r.date_heure_saisie), "dd/MM/yyyy HH:mm", { locale: fr })}</TableCell>
+                  <TableCell className="hidden lg:table-cell">{r.nombre_sacs === -1 ? "GC" : (r.nombre_sacs ?? 1)}</TableCell>
                   <TableCell>{r.quantite}</TableCell>
-                  <TableCell>{r.emplacement}</TableCell>
-                  <TableCell>{r.receptionniste || "—"}</TableCell>
+                  <TableCell className="hidden md:table-cell">{r.emplacement}</TableCell>
+                  <TableCell className="hidden xl:table-cell">{r.receptionniste || "—"}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                       r.etat === "Retour récupéré"
@@ -83,7 +82,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                       {r.etat || "Disponible"}
                     </span>
                   </TableCell>
-                  <TableCell className="text-xs">
+                  <TableCell className="text-xs hidden lg:table-cell">
                     {r.etat === "Retour récupéré" && r.date_retour_recupere
                       ? format(new Date(r.date_retour_recupere), "dd/MM/yyyy HH:mm", { locale: fr })
                       : "—"}
@@ -105,7 +104,6 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
               ))}
             </TableBody>
           </Table>
-          </div>
         </ScrollArea>
       </div>
 
