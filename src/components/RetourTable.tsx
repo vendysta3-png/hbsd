@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Pencil, Trash2, Package, ChevronLeft, ChevronRight } from "lucide-react";
+import { Pencil, Trash2, Package, ChevronLeft, ChevronRight, History } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import type { Retour } from "@/hooks/useRetours";
@@ -14,11 +14,12 @@ interface Props {
   onEdit: (retour: Retour) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, etat: string) => void;
+  onShowHistory: (retour: Retour) => void;
 }
 
 const PAGE_SIZE = 15;
 
-export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdit, onDelete, onStatusChange }: Props) {
+export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdit, onDelete, onStatusChange, onShowHistory }: Props) {
   const [page, setPage] = useState(0);
   const totalPages = Math.max(1, Math.ceil(retours.length / PAGE_SIZE));
   const paginated = retours.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -76,6 +77,9 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onShowHistory(r); }} title="Historique">
+                      <History className="h-4 w-4 text-muted-foreground" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(r); }}>
                       <Pencil className="h-4 w-4 text-primary" />
                     </Button>
