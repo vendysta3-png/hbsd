@@ -51,14 +51,17 @@ export default function RetoursPage() {
 
   const filtered = retours
     .filter((r) => filterEtat === "all" || (r.etat || "Disponible") === filterEtat)
+    .filter((r) => {
+      const date = new Date(r.date_heure_saisie);
+      if (dateFrom && isBefore(date, startOfDay(dateFrom))) return false;
+      if (dateTo && isAfter(date, endOfDay(dateTo))) return false;
+      return true;
+    })
     .filter((r) =>
       [r.expediteur, r.emplacement, r.quantite, r.receptionniste, r.etat]
         .filter(Boolean)
         .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
     );
-
-
-  // Export is handled by ExportMenu component
 
   return (
     <div className="space-y-4">
