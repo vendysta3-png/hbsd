@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Pencil, Trash2, Package, ChevronLeft, ChevronRight, History } from "lucide-react";
+import { Pencil, Trash2, Package, ChevronLeft, ChevronRight, History, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,9 +21,45 @@ interface Props {
 const PAGE_SIZES = [15, 25, 50, 100, "all"] as const;
 type PageSize = (typeof PAGE_SIZES)[number];
 
+function DetailRow({ retour }: { retour: Retour }) {
+  return (
+    <TableRow className="bg-muted/20 border-b">
+      <TableCell colSpan={5} className="p-3">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+          <div className="sm:hidden">
+            <span className="text-muted-foreground text-xs">Date saisie</span>
+            <p className="font-medium">{format(new Date(retour.date_heure_saisie), "dd/MM/yyyy HH:mm", { locale: fr })}</p>
+          </div>
+          <div className="md:hidden">
+            <span className="text-muted-foreground text-xs">Emplacement</span>
+            <p className="font-medium">{retour.emplacement}</p>
+          </div>
+          <div className="lg:hidden">
+            <span className="text-muted-foreground text-xs">Sacs</span>
+            <p className="font-medium">{retour.nombre_sacs === -1 ? "GC" : (retour.nombre_sacs ?? 1)}</p>
+          </div>
+          <div className="lg:hidden">
+            <span className="text-muted-foreground text-xs">Date récupéré</span>
+            <p className="font-medium">
+              {retour.etat === "Retour récupéré" && retour.date_retour_recupere
+                ? format(new Date(retour.date_retour_recupere), "dd/MM/yyyy HH:mm", { locale: fr })
+                : "—"}
+            </p>
+          </div>
+          <div className="xl:hidden">
+            <span className="text-muted-foreground text-xs">Réceptionniste</span>
+            <p className="font-medium">{retour.receptionniste || "—"}</p>
+          </div>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+}
+
 export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdit, onDelete, onStatusChange, onShowHistory }: Props) {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<PageSize>(15);
+  const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
 
   const effectiveSize = pageSize === "all" ? retours.length || 1 : pageSize;
   const totalPages = Math.max(1, Math.ceil(retours.length / effectiveSize));
@@ -33,6 +69,11 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
     const newSize = value === "all" ? ("all" as const) : (Number(value) as 15 | 25 | 50 | 100);
     setPageSize(newSize);
     setPage(0);
+  };
+
+  const handleRowClick = (id: string) => {
+    setExpandedRowId(expandedRowId === id ? null : id);
+    onSelectRow(id);
   };
 
   if (retours.length === 0) {
@@ -46,6 +87,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30 sticky top-0 z-10">
+                <TableHead className="w-8 xl:hidden"></TableHead>
                 <TableHead>Expéditeur</TableHead>
                 <TableHead className="hidden sm:table-cell">Date saisie</TableHead>
                 <TableHead className="hidden lg:table-cell">Sacs</TableHead>
@@ -59,48 +101,54 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
             </TableHeader>
             <TableBody>
               {paginated.map((r) => (
-                <TableRow
-                  key={r.id}
-                  className={`cursor-pointer transition-colors h-10 ${
-                    selectedRowId === r.id ? "bg-primary/10" : "hover:bg-muted/50"
-                  }`}
-                  onClick={() => onSelectRow(r.id)}
-                >
-                  <TableCell className="font-medium">{r.expediteur}</TableCell>
-                  <TableCell className="text-xs hidden sm:table-cell">{format(new Date(r.date_heure_saisie), "dd/MM/yyyy HH:mm", { locale: fr })}</TableCell>
-                  <TableCell className="hidden lg:table-cell">{r.nombre_sacs === -1 ? "GC" : (r.nombre_sacs ?? 1)}</TableCell>
-                  <TableCell>{r.quantite}</TableCell>
-                  <TableCell className="hidden md:table-cell">{r.emplacement}</TableCell>
-                  <TableCell className="hidden xl:table-cell">{r.receptionniste || "—"}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                      r.etat === "Retour récupéré"
-                        ? "bg-status-recovered/15 text-status-recovered"
-                        : "bg-status-available/15 text-status-available"
-                    }`}>
-                      <Package className="h-3 w-3" />
-                      {r.etat || "Disponible"}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-xs hidden lg:table-cell">
-                    {r.etat === "Retour récupéré" && r.date_retour_recupere
-                      ? format(new Date(r.date_retour_recupere), "dd/MM/yyyy HH:mm", { locale: fr })
-                      : "—"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onShowHistory(r); }} title="Historique">
-                        <History className="h-4 w-4 text-muted-foreground" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(r); }}>
-                        <Pencil className="h-4 w-4 text-primary" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(r.id); }}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <>
+                  <TableRow
+                    key={r.id}
+                    className={`cursor-pointer transition-colors h-10 ${
+                      selectedRowId === r.id ? "bg-primary/10" : "hover:bg-muted/50"
+                    }`}
+                    onClick={() => handleRowClick(r.id)}
+                  >
+                    <TableCell className="xl:hidden w-8 px-2">
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${expandedRowId === r.id ? "rotate-180" : ""}`} />
+                    </TableCell>
+                    <TableCell className="font-medium">{r.expediteur}</TableCell>
+                    <TableCell className="text-xs hidden sm:table-cell">{format(new Date(r.date_heure_saisie), "dd/MM/yyyy HH:mm", { locale: fr })}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{r.nombre_sacs === -1 ? "GC" : (r.nombre_sacs ?? 1)}</TableCell>
+                    <TableCell>{r.quantite}</TableCell>
+                    <TableCell className="hidden md:table-cell">{r.emplacement}</TableCell>
+                    <TableCell className="hidden xl:table-cell">{r.receptionniste || "—"}</TableCell>
+                    <TableCell>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                        r.etat === "Retour récupéré"
+                          ? "bg-status-recovered/15 text-status-recovered"
+                          : "bg-status-available/15 text-status-available"
+                      }`}>
+                        <Package className="h-3 w-3" />
+                        {r.etat || "Disponible"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-xs hidden lg:table-cell">
+                      {r.etat === "Retour récupéré" && r.date_retour_recupere
+                        ? format(new Date(r.date_retour_recupere), "dd/MM/yyyy HH:mm", { locale: fr })
+                        : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onShowHistory(r); }} title="Historique">
+                          <History className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(r); }}>
+                          <Pencil className="h-4 w-4 text-primary" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(r.id); }}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                  {expandedRowId === r.id && <DetailRow key={`detail-${r.id}`} retour={r} />}
+                </>
               ))}
             </TableBody>
           </Table>
