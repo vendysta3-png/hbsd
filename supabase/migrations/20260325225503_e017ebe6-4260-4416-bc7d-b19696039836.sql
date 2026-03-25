@@ -1,0 +1,1 @@
+ALTER TABLE public.retours_colis ADD COLUMN archived boolean NOT NULL DEFAULT false;

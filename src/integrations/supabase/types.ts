@@ -34,6 +34,7 @@ export type Database = {
       }
       retours_colis: {
         Row: {
+          archived: boolean
           created_at: string | null
           date_heure_saisie: string
           date_retour_recupere: string | null
@@ -47,6 +48,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          archived?: boolean
           created_at?: string | null
           date_heure_saisie?: string
           date_retour_recupere?: string | null
@@ -60,6 +62,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          archived?: boolean
           created_at?: string | null
           date_heure_saisie?: string
           date_retour_recupere?: string | null
