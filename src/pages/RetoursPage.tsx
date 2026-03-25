@@ -11,7 +11,8 @@ import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Plus, Search, Printer, Users, Upload, AlertTriangle } from "lucide-react";
+import { Plus, Search, Printer, Users, Upload, AlertTriangle, Clock } from "lucide-react";
+import { differenceInDays } from "date-fns";
 import ReceptionnistesManager from "@/components/ReceptionnistesManager";
 import ExportMenu from "@/components/ExportMenu";
 import ImportDialog from "@/components/ImportDialog";
@@ -48,6 +49,10 @@ export default function RetoursPage() {
         .filter(Boolean)
         .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
     );
+
+  const overdueRetours = retours.filter(
+    (r) => (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7
+  );
 
   // Export is handled by ExportMenu component
 
@@ -86,6 +91,27 @@ export default function RetoursPage() {
           )}
         </div>
       </div>
+
+      {overdueRetours.length > 0 && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+            <span className="font-semibold text-destructive">
+              {overdueRetours.length} retour{overdueRetours.length > 1 ? "s" : ""} non récupéré{overdueRetours.length > 1 ? "s" : ""} depuis plus de 7 jours
+            </span>
+          </div>
+          <div className="space-y-1">
+            {overdueRetours.map((r) => (
+              <div key={r.id} className="flex items-center gap-2 text-sm text-destructive/80">
+                <Clock className="h-3.5 w-3.5" />
+                <span className="font-medium">{r.expediteur}</span>
+                <span className="text-muted-foreground">—</span>
+                <span>{differenceInDays(new Date(), new Date(r.date_heure_saisie))} jours · {r.emplacement}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <p>Chargement...</p>
