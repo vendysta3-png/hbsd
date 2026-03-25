@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LayoutDashboard, Package, Users, Settings, Database, LogOut, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import { useBranding } from "@/hooks/useBranding";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +30,7 @@ export default function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { appName, logoUrl } = useBranding();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
 
@@ -43,7 +45,12 @@ export default function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="text-lg font-bold px-4 py-3">
-            📦 Gestion Retours
+            {logoUrl ? (
+              <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded object-contain mr-2 inline" />
+            ) : (
+              <span className="mr-1">📦</span>
+            )}
+            {appName}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>

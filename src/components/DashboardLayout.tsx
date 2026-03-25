@@ -5,10 +5,12 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { Package, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useBranding } from "@/hooks/useBranding";
 import NotificationHistory from "@/components/NotificationHistory";
 
 export default function DashboardLayout() {
   const { user } = useAuth();
+  const { appName, logoUrl } = useBranding();
   const [showNotifications, setShowNotifications] = useState(false);
 
   return (
@@ -19,8 +21,12 @@ export default function DashboardLayout() {
           <header className="no-print sticky top-0 z-20 flex h-12 items-center justify-between bg-primary px-4 text-primary-foreground shadow-md">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" />
-              <Package className="h-5 w-5" />
-              <span className="font-semibold text-sm">Gestion des retours</span>
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo" className="h-6 w-6 rounded object-contain" />
+              ) : (
+                <Package className="h-5 w-5" />
+              )}
+              <span className="font-semibold text-sm">{appName}</span>
             </div>
             <div className="flex items-center gap-3">
               <span className="text-xs opacity-80 hidden sm:block">{user?.email}</span>
