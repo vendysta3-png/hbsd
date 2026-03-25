@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { LayoutDashboard, Package, Users, Settings, Database, LogOut, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import { useBranding } from "@/hooks/useBranding";
 import {
   Sidebar,
   SidebarContent,
