@@ -86,7 +86,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
         <ScrollArea className="h-[60vh]" type="always">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/30 sticky top-0 z-10">
+              <TableRow className="bg-muted sticky top-0 z-10">
                 <TableHead className="w-8 xl:hidden"></TableHead>
                 <TableHead>Expéditeur</TableHead>
                 <TableHead className="hidden sm:table-cell">Date saisie</TableHead>
