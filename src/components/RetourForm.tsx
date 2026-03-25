@@ -128,6 +128,7 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
             </div>
           ) : (
             <Input
+              type="number"
               value={form.nombre_sacs}
               onChange={(e) => setForm({ ...form, nombre_sacs: e.target.value })}
               required
@@ -136,7 +137,12 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
         </div>
         <div className="space-y-2">
           <Label>Quantité</Label>
-          <Input value={form.quantite} onChange={(e) => setForm({ ...form, quantite: e.target.value })} required />
+          <Input 
+            type="number"
+            value={form.quantite} 
+            onChange={(e) => setForm({ ...form, quantite: e.target.value })} 
+            required 
+          />
         </div>
       </div>
 
