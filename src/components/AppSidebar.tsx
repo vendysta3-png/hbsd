@@ -35,6 +35,11 @@ export default function AppSidebar() {
   const { appName, logoUrl } = useBranding();
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const { data: retours = [] } = useRetours();
+
+  const overdueCount = retours.filter(
+    (r) => (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7
+  ).length;
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
