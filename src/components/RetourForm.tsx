@@ -128,10 +128,9 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
             </div>
           ) : (
             <Input
-              type="number"
-              min={1}
               value={form.nombre_sacs}
-              onChange={(e) => setForm({ ...form, nombre_sacs: Math.max(1, parseInt(e.target.value) || 1) })}
+              onChange={(e) => setForm({ ...form, nombre_sacs: e.target.value })}
+              required
             />
           )}
         </div>
