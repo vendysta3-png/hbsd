@@ -32,6 +32,8 @@ export default function RetoursPage() {
   const logAction = useLogRetourAction();
   const [search, setSearch] = useState("");
   const [filterEtat, setFilterEtat] = useState("all");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showForm, setShowForm] = useState(false);
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
