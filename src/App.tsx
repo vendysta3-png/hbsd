@@ -7,6 +7,7 @@ import DashboardHome from "@/pages/DashboardHome";
 import RetoursPage from "@/pages/RetoursPage";
 import UsersPage from "@/pages/UsersPage";
 import SettingsPage from "@/pages/SettingsPage";
+import DatabasePage from "@/pages/DatabasePage";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import { AnimatedNotificationBox } from "@/components/AnimatedNotification";
 
@@ -29,6 +30,7 @@ function AppRoutes() {
         <Route path="/" element={<DashboardHome />} />
         <Route path="/retours" element={<RetoursPage />} />
         <Route path="/users" element={<UsersPage />} />
+        <Route path="/database" element={<DatabasePage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>

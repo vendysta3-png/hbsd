@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { LayoutDashboard, Package, Users, Settings, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Package, Users, Settings, Database, LogOut, Sun, Moon } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 import {
   Sidebar,
@@ -21,6 +21,7 @@ const navItems = [
   { title: "Tableau de bord", url: "/", icon: LayoutDashboard, iconColor: "text-blue-500" },
   { title: "Retours", url: "/retours", icon: Package, iconColor: "text-orange-500" },
   { title: "Utilisateurs", url: "/users", icon: Users, iconColor: "text-green-500" },
+  { title: "Base De Donnée", url: "/database", icon: Database, iconColor: "text-cyan-500" },
   { title: "Paramètres", url: "/settings", icon: Settings, iconColor: "text-purple-500" },
 ];
 
