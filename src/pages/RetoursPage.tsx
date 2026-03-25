@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { useRetours, useCreateRetour, useUpdateRetour, useDeleteRetour } from "@/hooks/useRetours";
 import { useLogRetourAction } from "@/hooks/useRetourHistory";
 import { useAuth } from "@/hooks/useAuth";
@@ -11,8 +13,10 @@ import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Plus, Search, Printer, Users, Upload, AlertTriangle } from "lucide-react";
-import { differenceInDays } from "date-fns";
+import { Plus, Search, Printer, Users, Upload, AlertTriangle, CalendarIcon, X } from "lucide-react";
+import { differenceInDays, format, isAfter, isBefore, startOfDay, endOfDay } from "date-fns";
+import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import ReceptionnistesManager from "@/components/ReceptionnistesManager";
 import ExportMenu from "@/components/ExportMenu";
 import ImportDialog from "@/components/ImportDialog";
@@ -28,6 +32,8 @@ export default function RetoursPage() {
   const logAction = useLogRetourAction();
   const [search, setSearch] = useState("");
   const [filterEtat, setFilterEtat] = useState("all");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showForm, setShowForm] = useState(false);
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
@@ -45,14 +51,17 @@ export default function RetoursPage() {
 
   const filtered = retours
     .filter((r) => filterEtat === "all" || (r.etat || "Disponible") === filterEtat)
+    .filter((r) => {
+      const date = new Date(r.date_heure_saisie);
+      if (dateFrom && isBefore(date, startOfDay(dateFrom))) return false;
+      if (dateTo && isAfter(date, endOfDay(dateTo))) return false;
+      return true;
+    })
     .filter((r) =>
       [r.expediteur, r.emplacement, r.quantite, r.receptionniste, r.etat]
         .filter(Boolean)
         .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
     );
-
-
-  // Export is handled by ExportMenu component
 
   return (
     <div className="space-y-4">
@@ -71,6 +80,33 @@ export default function RetoursPage() {
             <SelectItem value="Retour récupéré">Retour récupéré</SelectItem>
           </SelectContent>
         </Select>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !dateFrom && "text-muted-foreground")}>
+              <CalendarIcon className="mr-1 h-4 w-4" />
+              {dateFrom ? format(dateFrom, "dd/MM/yyyy") : "Date début"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} locale={fr} initialFocus className="p-3 pointer-events-auto" />
+          </PopoverContent>
+        </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !dateTo && "text-muted-foreground")}>
+              <CalendarIcon className="mr-1 h-4 w-4" />
+              {dateTo ? format(dateTo, "dd/MM/yyyy") : "Date fin"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={dateTo} onSelect={setDateTo} locale={fr} initialFocus className="p-3 pointer-events-auto" />
+          </PopoverContent>
+        </Popover>
+        {(dateFrom || dateTo) && (
+          <Button variant="ghost" size="icon" onClick={() => { setDateFrom(undefined); setDateTo(undefined); }} title="Réinitialiser les dates">
+            <X className="h-4 w-4" />
+          </Button>
+        )}
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => { setEditingRetour(null); setShowForm(true); }}>
             <Plus className="h-4 w-4" /> Nouveau
