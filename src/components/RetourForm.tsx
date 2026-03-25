@@ -156,19 +156,31 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
           />
         </div>
       </div>
-      <div className="flex flex-wrap gap-3">
-        {ZONES.map((zone) => (
-          <label key={zone} className={`flex items-center gap-1.5 text-sm ${form.grands_colis ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
-            <input
-              type="checkbox"
-              checked={form.zones.includes(zone)}
-              onChange={() => handleZoneToggle(zone)}
-              disabled={!form.grands_colis}
-              className="rounded border-border accent-primary h-4 w-4"
-            />
-            <span className="text-foreground">{zone}</span>
-          </label>
-        ))}
+      <div className="flex flex-wrap gap-2">
+        {ZONES.map((zone) => {
+          const isSelected = form.zones.includes(zone);
+          const isDisabled = !form.grands_colis;
+          return (
+            <button
+              key={zone}
+              type="button"
+              disabled={isDisabled}
+              onClick={() => handleZoneToggle(zone)}
+              className={`
+                px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border
+                ${isDisabled
+                  ? 'border-border bg-muted/30 text-muted-foreground/40 cursor-not-allowed'
+                  : isSelected
+                    ? 'border-primary bg-primary text-primary-foreground shadow-sm scale-105'
+                    : 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-accent cursor-pointer'
+                }
+              `}
+            >
+              {isSelected && <span className="mr-1">✓</span>}
+              {zone}
+            </button>
+          );
+        })}
       </div>
 
       {/* Emplacement */}
