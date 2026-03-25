@@ -144,8 +144,10 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
             />
           )}
         </div>
-        <div className="space-y-2">
-          <Label>Quantité</Label>
+        <div className="space-y-2 flex flex-col">
+          <div className="flex items-center h-[20px]">
+            <Label>Quantité</Label>
+          </div>
           <Input 
             type="number"
             value={form.quantite} 
