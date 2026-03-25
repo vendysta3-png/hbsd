@@ -81,39 +81,42 @@ export default function AppSidebar() {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
-        <SidebarFooter className="p-4 space-y-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
+        <SidebarFooter className={collapsed ? "p-1 flex flex-row items-center justify-center gap-0" : "p-4 space-y-1"}>
+          {collapsed ? (
+            <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleTheme}>
+                    {theme === "light" ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-yellow-400" />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-popover text-popover-foreground border rounded-md px-3 py-1.5 text-sm shadow-md z-50">
+                  {theme === "light" ? "Mode sombre" : "Mode clair"}
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 text-destructive" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-popover text-popover-foreground border rounded-md px-3 py-1.5 text-sm shadow-md z-50">
+                  Déconnexion
+                </TooltipContent>
+              </Tooltip>
+            </>
+          ) : (
+            <>
               <Button variant="ghost" className="w-full justify-start" onClick={toggleTheme}>
                 {theme === "light" ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-yellow-400" />}
-                {!collapsed && <span>{theme === "light" ? "Mode sombre" : "Mode clair"}</span>}
+                <span>{theme === "light" ? "Mode sombre" : "Mode clair"}</span>
               </Button>
-            </TooltipTrigger>
-            {collapsed && (
-              <TooltipContent
-                side="right"
-                className="bg-popover text-popover-foreground border rounded-md px-3 py-1.5 text-sm shadow-md z-50"
-              >
-                {theme === "light" ? "Mode sombre" : "Mode clair"}
-              </TooltipContent>
-            )}
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger asChild>
               <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 text-red-400" />
-                {!collapsed && <span>Déconnexion</span>}
+                <LogOut className="h-4 w-4 text-destructive" />
+                <span>Déconnexion</span>
               </Button>
-            </TooltipTrigger>
-            {collapsed && (
-              <TooltipContent
-                side="right"
-                className="bg-popover text-popover-foreground border rounded-md px-3 py-1.5 text-sm shadow-md z-50"
-              >
-                Déconnexion
-              </TooltipContent>
-            )}
-          </Tooltip>
+            </>
+          )}
         </SidebarFooter>
       </Sidebar>
     </TooltipProvider>
