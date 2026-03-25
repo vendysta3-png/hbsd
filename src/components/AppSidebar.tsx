@@ -68,7 +68,14 @@ export default function AppSidebar() {
                     isActive={location.pathname === item.url}
                     className="cursor-pointer"
                   >
-                    <item.icon className={`h-4 w-4 ${item.iconColor}`} />
+                    <div className="relative">
+                      <item.icon className={`h-4 w-4 ${item.iconColor}`} />
+                      {item.url === "/" && overdueCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
+                          {overdueCount > 9 ? "9+" : overdueCount}
+                        </span>
+                      )}
+                    </div>
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
