@@ -83,7 +83,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
   return (
     <div className="space-y-3">
       <div className="rounded-lg border overflow-hidden">
-        <ScrollArea className="h-[60vh]" type="always">
+        <ScrollArea className="h-[80vh]" type="always">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted sticky top-0 z-10">
