@@ -86,7 +86,7 @@ export default function AppSidebar() {
             <TooltipTrigger asChild>
               <Button variant="ghost" className="w-full justify-start" onClick={toggleTheme}>
                 {theme === "light" ? <Moon className="h-4 w-4 text-muted-foreground" /> : <Sun className="h-4 w-4 text-yellow-400" />}
-                <span>{theme === "light" ? "Mode sombre" : "Mode clair"}</span>
+                {!collapsed && <span>{theme === "light" ? "Mode sombre" : "Mode clair"}</span>}
               </Button>
             </TooltipTrigger>
             {collapsed && (
@@ -102,7 +102,7 @@ export default function AppSidebar() {
             <TooltipTrigger asChild>
               <Button variant="ghost" className="w-full justify-start" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 text-red-400" />
-                <span>Déconnexion</span>
+                {!collapsed && <span>Déconnexion</span>}
               </Button>
             </TooltipTrigger>
             {collapsed && (
