@@ -21,6 +21,7 @@ function toLocalDatetime(iso: string | null | undefined): string {
 const NUMBERS = Array.from({ length: 50 }, (_, i) => String(i + 1));
 const LETTERS = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
 const EMPLACEMENT_OPTIONS = [...NUMBERS, ...LETTERS];
+const NUM_OPTIONS = Array.from({ length: 9 }, (_, i) => String(i + 1));
 const ZONES = ["Fou9", "Wast", "Ta7t"] as const;
 
 function parseEmplacement(emp: string) {
