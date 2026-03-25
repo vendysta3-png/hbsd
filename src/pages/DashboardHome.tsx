@@ -1,16 +1,21 @@
+import { useState } from "react";
 import { useRetours } from "@/hooks/useRetours";
 import StatsCards from "@/components/StatsCards";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Clock, Package } from "lucide-react";
+import { Clock, Package, AlertTriangle, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function DashboardHome() {
   const { data: retours = [] } = useRetours();
   const navigate = useNavigate();
+  const [overdueExpanded, setOverdueExpanded] = useState(false);
   const recentRetours = retours.slice(0, 10);
+  const overdueRetours = retours.filter(
+    (r) => (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7
+  );
 
   return (
     <div className="space-y-6">
