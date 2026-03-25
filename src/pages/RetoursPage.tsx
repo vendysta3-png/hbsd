@@ -11,11 +11,11 @@ import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, FileDown, Printer, Users } from "lucide-react";
+import { Plus, Search, Printer, Users, Upload } from "lucide-react";
 import ReceptionnistesManager from "@/components/ReceptionnistesManager";
+import ExportMenu from "@/components/ExportMenu";
+import ImportDialog from "@/components/ImportDialog";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 
 export default function RetoursPage() {
   const { isAdmin } = useAuth();
