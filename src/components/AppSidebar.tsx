@@ -62,7 +62,7 @@ export default function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className={collapsed ? "p-1 flex flex-row items-center justify-center gap-0" : "p-4 space-y-1"}>
+      <SidebarFooter className={collapsed ? "p-1 flex flex-col items-center gap-1" : "p-4 space-y-1"}>
         {collapsed ? (
           <>
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={toggleTheme}>
