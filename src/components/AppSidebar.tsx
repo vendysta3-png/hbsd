@@ -78,6 +78,11 @@ export default function AppSidebar() {
                           {overdueCount > 9 ? "9+" : overdueCount}
                         </span>
                       )}
+                      {item.url === "/archived" && archivedCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 flex h-4 w-auto min-w-[14px] px-1 items-center justify-center rounded-full bg-accent text-[9px] font-bold text-accent-foreground">
+                          {archivedCount > 99 ? "99+" : archivedCount}
+                        </span>
+                      )}
                     </div>
                     <span>{item.title}</span>
                   </SidebarMenuButton>
