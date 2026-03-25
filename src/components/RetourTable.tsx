@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Pencil, Trash2, Package, ChevronLeft, ChevronRight, History, ChevronDown } from "lucide-react";
-import { format } from "date-fns";
+import { Pencil, Trash2, Package, ChevronLeft, ChevronRight, History, ChevronDown, AlertTriangle } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Retour } from "@/hooks/useRetours";
@@ -100,11 +100,14 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginated.map((r) => (
+              {paginated.map((r) => {
+                const isOverdue = (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7;
+                return (
                 <>
                   <TableRow
                     key={r.id}
                     className={`cursor-pointer transition-colors h-10 ${
+                      isOverdue ? "bg-destructive/5 hover:bg-destructive/10" :
                       selectedRowId === r.id ? "bg-primary/10" : "hover:bg-muted/50"
                     }`}
                     onClick={() => handleRowClick(r.id)}
@@ -112,7 +115,12 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                     <TableCell className="xl:hidden w-8 px-2">
                       <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${expandedRowId === r.id ? "rotate-180" : ""}`} />
                     </TableCell>
-                    <TableCell className="font-medium">{r.expediteur}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-1.5">
+                        {isOverdue && <AlertTriangle className="h-3.5 w-3.5 text-destructive flex-shrink-0" />}
+                        {r.expediteur}
+                      </div>
+                    </TableCell>
                     <TableCell className="text-xs hidden sm:table-cell">{format(new Date(r.date_heure_saisie), "dd/MM/yyyy HH:mm", { locale: fr })}</TableCell>
                     <TableCell className="hidden lg:table-cell">{r.nombre_sacs === -1 ? "GC" : (r.nombre_sacs ?? 1)}</TableCell>
                     <TableCell>{r.quantite}</TableCell>
@@ -149,7 +157,8 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                   </TableRow>
                   {expandedRowId === r.id && <DetailRow key={`detail-${r.id}`} retour={r} />}
                 </>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </ScrollArea>
