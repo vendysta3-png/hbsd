@@ -96,7 +96,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                 <TableHead className="hidden xl:table-cell">Réceptionniste</TableHead>
                 <TableHead>État</TableHead>
                 <TableHead className="hidden lg:table-cell">Date récupéré</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="sticky right-0 bg-muted z-20">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -133,7 +133,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                         ? format(new Date(r.date_retour_recupere), "dd/MM/yyyy HH:mm", { locale: fr })
                         : "—"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="sticky right-0 bg-background z-10">
                       <div className="flex gap-1">
                         <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onShowHistory(r); }} title="Historique">
                           <History className="h-4 w-4 text-muted-foreground" />
