@@ -105,6 +105,7 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
               ))}
             </TableBody>
           </Table>
+          </div>
         </ScrollArea>
       </div>
 
