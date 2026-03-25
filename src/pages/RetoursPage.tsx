@@ -11,11 +11,11 @@ import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Search, FileDown, Printer, Users } from "lucide-react";
+import { Plus, Search, Printer, Users, Upload } from "lucide-react";
 import ReceptionnistesManager from "@/components/ReceptionnistesManager";
+import ExportMenu from "@/components/ExportMenu";
+import ImportDialog from "@/components/ImportDialog";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 
 export default function RetoursPage() {
   const { isAdmin } = useAuth();
@@ -30,6 +30,7 @@ export default function RetoursPage() {
   const [editingRetour, setEditingRetour] = useState<any>(null);
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [showReceptionnistes, setShowReceptionnistes] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [showPrint, setShowPrint] = useState(false);
   const [historyRetour, setHistoryRetour] = useState<any>(null);
   const [searchParams] = useSearchParams();
@@ -47,14 +48,7 @@ export default function RetoursPage() {
         .some((v) => v!.toLowerCase().includes(search.toLowerCase()))
     );
 
-  const handleExport = () => {
-    const ws = XLSX.utils.json_to_sheet(retours);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Retours");
-    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    saveAs(new Blob([buf]), "retours.xlsx");
-    toast.success("Export Excel réussi");
-  };
+  // Export is handled by ExportMenu component
 
   return (
     <div className="space-y-4">
@@ -64,8 +58,9 @@ export default function RetoursPage() {
           <Button onClick={() => { setEditingRetour(null); setShowForm(true); }}>
             <Plus className="h-4 w-4" /> Nouveau
           </Button>
-          <Button variant="outline" onClick={handleExport}>
-            <FileDown className="h-4 w-4 text-status-available" /> Excel
+          <ExportMenu retours={retours} />
+          <Button variant="outline" onClick={() => setShowImport(true)}>
+            <Upload className="h-4 w-4 text-status-available" /> Importer
           </Button>
           <Button variant="outline" onClick={() => setShowPrint(true)}>
             <Printer className="h-4 w-4 text-primary" /> Imprimer
@@ -176,6 +171,8 @@ export default function RetoursPage() {
         retourId={historyRetour?.id || null}
         expediteur={historyRetour?.expediteur}
       />
+
+      <ImportDialog open={showImport} onOpenChange={setShowImport} />
     </div>
   );
 }
