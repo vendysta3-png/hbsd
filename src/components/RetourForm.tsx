@@ -69,9 +69,7 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
   const handleZoneToggle = (zone: string) => {
     setForm((prev) => ({
       ...prev,
-      zones: prev.zones.includes(zone)
-        ? prev.zones.filter((z) => z !== zone)
-        : [...prev.zones, zone],
+      zones: prev.zones.includes(zone) ? [] : [zone],
     }));
   };
 
@@ -116,7 +114,7 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
               <input
                 type="checkbox"
                 checked={form.grands_colis}
-                onChange={(e) => setForm({ ...form, grands_colis: e.target.checked })}
+                onChange={(e) => setForm({ ...form, grands_colis: e.target.checked, zones: e.target.checked ? form.zones : [] })}
                 className="rounded border-border accent-primary h-4 w-4"
               />
               <span className="text-muted-foreground">Grands colis</span>
@@ -164,11 +162,12 @@ export default function RetourForm({ initialData, onSubmit }: Props) {
         </Select>
         <div className="flex flex-wrap gap-3 mt-2">
           {ZONES.map((zone) => (
-            <label key={zone} className="flex items-center gap-1.5 cursor-pointer text-sm">
+            <label key={zone} className={`flex items-center gap-1.5 text-sm ${form.grands_colis ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}>
               <input
                 type="checkbox"
                 checked={form.zones.includes(zone)}
                 onChange={() => handleZoneToggle(zone)}
+                disabled={!form.grands_colis}
                 className="rounded border-border accent-primary h-4 w-4"
               />
               <span className="text-foreground">{zone}</span>
