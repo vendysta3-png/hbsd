@@ -52,8 +52,21 @@ export default function RetoursPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Liste des retours</h1>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[150px] max-w-sm">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
+        </div>
+        <Select value={filterEtat} onValueChange={setFilterEtat}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filtrer par état" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tous les états</SelectItem>
+            <SelectItem value="Disponible">Disponible</SelectItem>
+            <SelectItem value="Retour récupéré">Retour récupéré</SelectItem>
+          </SelectContent>
+        </Select>
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => { setEditingRetour(null); setShowForm(true); }}>
             <Plus className="h-4 w-4" /> Nouveau
@@ -71,23 +84,6 @@ export default function RetoursPage() {
             </Button>
           )}
         </div>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
-        </div>
-        <Select value={filterEtat} onValueChange={setFilterEtat}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrer par état" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous les états</SelectItem>
-            <SelectItem value="Disponible">Disponible</SelectItem>
-            <SelectItem value="Retour récupéré">Retour récupéré</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
       {isLoading ? (
