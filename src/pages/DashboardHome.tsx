@@ -1,16 +1,21 @@
+import { useState } from "react";
 import { useRetours } from "@/hooks/useRetours";
 import StatsCards from "@/components/StatsCards";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Clock, Package } from "lucide-react";
+import { Clock, Package, AlertTriangle, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function DashboardHome() {
   const { data: retours = [] } = useRetours();
   const navigate = useNavigate();
+  const [overdueExpanded, setOverdueExpanded] = useState(false);
   const recentRetours = retours.slice(0, 10);
+  const overdueRetours = retours.filter(
+    (r) => (r.etat || "Disponible") === "Disponible" && differenceInDays(new Date(), new Date(r.date_heure_saisie)) >= 7
+  );
 
   return (
     <div className="space-y-6">
@@ -19,6 +24,42 @@ export default function DashboardHome() {
         <p className="text-muted-foreground text-sm">Vue d'ensemble des retours de colis</p>
       </div>
       <StatsCards retours={retours} />
+
+      {overdueRetours.length > 0 && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10">
+          <button
+            type="button"
+            className="flex items-center justify-between w-full p-4 text-left"
+            onClick={() => setOverdueExpanded(!overdueExpanded)}
+          >
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <span className="font-semibold text-destructive">
+                {overdueRetours.length} retour{overdueRetours.length > 1 ? "s" : ""} non récupéré{overdueRetours.length > 1 ? "s" : ""} depuis plus de 7 jours
+              </span>
+            </div>
+            <ChevronDown className={`h-5 w-5 text-destructive transition-transform duration-200 ${overdueExpanded ? "rotate-180" : ""}`} />
+          </button>
+          {overdueExpanded && (
+            <div className="px-4 pb-4">
+              <div className="max-h-[200px] overflow-y-auto space-y-1 pr-1">
+                {overdueRetours.map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center gap-2 text-sm text-destructive/80 cursor-pointer hover:bg-destructive/10 rounded px-2 py-1"
+                    onClick={() => navigate(`/retours?selected=${r.id}`)}
+                  >
+                    <Clock className="h-3.5 w-3.5 flex-shrink-0" />
+                    <span className="font-medium">{r.expediteur}</span>
+                    <span className="text-muted-foreground">—</span>
+                    <span>{differenceInDays(new Date(), new Date(r.date_heure_saisie))} jours · {r.emplacement}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <Card>
         <CardHeader>
