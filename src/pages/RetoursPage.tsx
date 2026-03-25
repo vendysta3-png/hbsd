@@ -11,7 +11,7 @@ import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Plus, Search, Printer, Users, Upload, AlertTriangle, Clock } from "lucide-react";
+import { Plus, Search, Printer, Users, Upload, AlertTriangle, Clock, ChevronDown } from "lucide-react";
 import { differenceInDays } from "date-fns";
 import ReceptionnistesManager from "@/components/ReceptionnistesManager";
 import ExportMenu from "@/components/ExportMenu";
