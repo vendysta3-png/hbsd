@@ -25,22 +25,31 @@ const NUM_OPTIONS = Array.from({ length: 9 }, (_, i) => String(i + 1));
 const ZONES = ["Fou9", "Wast", "Ta7t"] as const;
 
 function parseEmplacement(emp: string) {
-  if (!emp) return { base: "", zones: [] as string[] };
+  if (!emp) return { base: "", num: "", zones: [] as string[] };
   const parts = emp.split(",").map((s) => s.trim()).filter(Boolean);
   const zones: string[] = [];
   let base = "";
+  let num = "";
   for (const p of parts) {
     if ((ZONES as readonly string[]).includes(p)) {
       zones.push(p);
     } else if (!base) {
-      base = p;
+      // Check if format is "A - 3"
+      const match = p.match(/^([A-Z])\s*-\s*(\d)$/);
+      if (match) {
+        base = match[1];
+        num = match[2];
+      } else {
+        base = p;
+      }
     }
   }
-  return { base, zones };
+  return { base, num, zones };
 }
 
-function buildEmplacement(base: string, zones: string[]) {
-  const parts = [base, ...zones].filter(Boolean);
+function buildEmplacement(base: string, num: string, zones: string[]) {
+  const baseWithNum = base && num && LETTERS.includes(base) ? `${base} - ${num}` : base;
+  const parts = [baseWithNum, ...zones].filter(Boolean);
   return parts.join(", ");
 }
 
