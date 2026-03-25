@@ -74,6 +74,33 @@ export type Database = {
         }
         Relationships: []
       }
+      retours_historique: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          retour_id: string
+          user_email: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          retour_id: string
+          user_email?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          retour_id?: string
+          user_email?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

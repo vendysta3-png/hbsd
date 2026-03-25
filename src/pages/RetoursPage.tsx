@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRetours, useCreateRetour, useUpdateRetour, useDeleteRetour } from "@/hooks/useRetours";
+import { useLogRetourAction } from "@/hooks/useRetourHistory";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "react-router-dom";
 import RetourTable from "@/components/RetourTable";
 import RetourForm from "@/components/RetourForm";
 import PrintDialog from "@/components/PrintDialog";
+import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -21,6 +23,7 @@ export default function RetoursPage() {
   const createRetour = useCreateRetour();
   const updateRetour = useUpdateRetour();
   const deleteRetour = useDeleteRetour();
+  const logAction = useLogRetourAction();
   const [search, setSearch] = useState("");
   const [filterEtat, setFilterEtat] = useState("all");
   const [showForm, setShowForm] = useState(false);
@@ -28,6 +31,7 @@ export default function RetoursPage() {
   const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
   const [showReceptionnistes, setShowReceptionnistes] = useState(false);
   const [showPrint, setShowPrint] = useState(false);
+  const [historyRetour, setHistoryRetour] = useState<any>(null);
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -100,9 +104,27 @@ export default function RetoursPage() {
           onSelectRow={(id) => setSelectedRowId(selectedRowId === id ? null : id)}
           onEdit={(r) => { setEditingRetour(r); setShowForm(true); }}
           onDelete={(id) => {
-            if (window.confirm("Supprimer ce retour ?")) deleteRetour.mutate(id);
+            if (window.confirm("Supprimer ce retour ?")) {
+              const retour = retours.find(r => r.id === id);
+              deleteRetour.mutate(id, {
+                onSuccess: () => {
+                  logAction.mutate({ retour_id: id, action: "suppression", details: { expediteur: retour?.expediteur } });
+                }
+              });
+            }
           }}
-          onStatusChange={(id, etat) => updateRetour.mutate({ id, etat, date_retour_recupere: etat === "Retour récupéré" ? new Date().toISOString() : null })}
+          onStatusChange={(id, etat) => {
+            const retour = retours.find(r => r.id === id);
+            updateRetour.mutate(
+              { id, etat, date_retour_recupere: etat === "Retour récupéré" ? new Date().toISOString() : null },
+              {
+                onSuccess: () => {
+                  logAction.mutate({ retour_id: id, action: "changement_état", details: { etat: { from: retour?.etat || "Disponible", to: etat } } });
+                }
+              }
+            );
+          }}
+          onShowHistory={(r) => setHistoryRetour(r)}
         />
       )}
 
@@ -124,15 +146,36 @@ export default function RetoursPage() {
             initialData={editingRetour}
             onSubmit={(data) => {
               if (editingRetour) {
-                updateRetour.mutate({ id: editingRetour.id, ...data });
+                const changes: Record<string, any> = {};
+                for (const key of Object.keys(data)) {
+                  if (data[key] !== editingRetour[key]) {
+                    changes[key] = { from: editingRetour[key], to: data[key] };
+                  }
+                }
+                updateRetour.mutate({ id: editingRetour.id, ...data }, {
+                  onSuccess: () => {
+                    logAction.mutate({ retour_id: editingRetour.id, action: "modification", details: changes });
+                  }
+                });
               } else {
-                createRetour.mutate(data);
+                createRetour.mutate(data, {
+                  onSuccess: (created) => {
+                    logAction.mutate({ retour_id: created.id, action: "création", details: { expediteur: data.expediteur } });
+                  }
+                });
               }
               setShowForm(false);
             }}
           />
         </DialogContent>
       </Dialog>
+
+      <RetourHistoryDialog
+        open={!!historyRetour}
+        onOpenChange={(v) => { if (!v) setHistoryRetour(null); }}
+        retourId={historyRetour?.id || null}
+        expediteur={historyRetour?.expediteur}
+      />
     </div>
   );
 }
