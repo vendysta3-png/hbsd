@@ -12,15 +12,24 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    // Verify caller is admin
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user: caller } } = await adminClient.auth.getUser(token);
-    if (!caller) throw new Error("Non authentifié");
+    // Verify caller using a user-context client
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("Non authentifié");
 
-    const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: caller.id, _role: "admin" });
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) throw new Error("Non authentifié");
+
+    const callerId = claimsData.claims.sub as string;
+
+    const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: callerId, _role: "admin" });
     if (!isAdmin) throw new Error("Non autorisé");
 
     const { action, email, password, role, userId } = await req.json();
@@ -28,7 +37,6 @@ serve(async (req) => {
     if (action === "list") {
       const { data: { users }, error } = await adminClient.auth.admin.listUsers();
       if (error) throw error;
-      // Enrich with roles
       const { data: roles } = await adminClient.from("user_roles").select("*");
       const enriched = users.map((u) => ({
         id: u.id,
@@ -62,7 +70,6 @@ serve(async (req) => {
       const { error } = await adminClient.auth.admin.updateUserById(userId, updates);
       if (error) throw error;
 
-      // Update role
       if (role) {
         await adminClient.from("user_roles").upsert({ user_id: userId, role }, { onConflict: "user_id" });
       }
