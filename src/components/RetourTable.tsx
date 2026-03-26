@@ -58,6 +58,7 @@ function DetailRow({ retour }: { retour: Retour }) {
 }
 
 export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdit, onDelete, onStatusChange, onShowHistory }: Props) {
+  const { isAdmin } = useAuth();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<PageSize>(15);
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
