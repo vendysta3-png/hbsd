@@ -112,6 +112,12 @@ export default function ArchivedRetoursPage() {
         </div>
       )}
 
+      {!isAdmin && !isLoading && filtered.length > 0 && (
+        <p className="text-sm text-muted-foreground text-center py-2 italic">
+          Vous n'avez pas la permission de restaurer ou supprimer les retours archivés. Contactez un administrateur.
+        </p>
+      )}
+
       <RetourHistoryDialog
         open={!!historyRetour}
         onOpenChange={(v) => { if (!v) setHistoryRetour(null); }}
