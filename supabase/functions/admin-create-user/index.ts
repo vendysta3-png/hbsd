@@ -34,17 +34,24 @@ serve(async (req) => {
       return jsonResponse({ error: "Non authentifié" }, 401);
     }
 
-    const userClient = createClient(supabaseUrl, anonKey, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: { headers: { Authorization: `Bearer ${token}` } },
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        apikey: anonKey,
+      },
     });
 
-    const { data: userData, error: userError } = await userClient.auth.getUser(token);
-    if (userError || !userData?.user) {
+    if (!userRes.ok) {
       return jsonResponse({ error: "Non authentifié" }, 401);
     }
 
-    const callerId = userData.user.id;
+    const caller = await userRes.json();
+    const callerId = caller?.id as string | undefined;
+
+    if (!callerId) {
+      return jsonResponse({ error: "Non authentifié" }, 401);
+    }
+
     const adminClient = createClient(supabaseUrl, serviceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
