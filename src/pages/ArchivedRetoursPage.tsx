@@ -29,6 +29,8 @@ export default function ArchivedRetoursPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [bulkRestoreOpen, setBulkRestoreOpen] = useState(false);
+  const [bulkRestoring, setBulkRestoring] = useState(false);
 
   const filtered = archived.filter((r) =>
     [r.expediteur, r.emplacement, r.quantite, r.receptionniste]
@@ -83,6 +85,37 @@ export default function ArchivedRetoursPage() {
     }
   }
 
+  async function handleBulkRestore() {
+    setBulkRestoring(true);
+    try {
+      const ids = Array.from(selected);
+      const { error } = await supabase.from("retours_colis").update({ archived: false }).in("id", ids);
+      if (error) throw error;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      const historyEntries = ids.map((id) => {
+        const retour = archived.find((r) => r.id === id);
+        return {
+          retour_id: id,
+          action: "restauration",
+          details: { expediteur: retour?.expediteur, bulk: true },
+          user_email: user?.email || null,
+        };
+      });
+      await supabase.from("retours_historique").insert(historyEntries);
+
+      queryClient.invalidateQueries({ queryKey: ["retours"] });
+      queryClient.invalidateQueries({ queryKey: ["archived-retours"] });
+      toast.success(`${ids.length} retour(s) restauré(s)`);
+      setSelected(new Set());
+    } catch (e: any) {
+      toast.error("Erreur: " + e.message);
+    } finally {
+      setBulkRestoring(false);
+      setBulkRestoreOpen(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 flex-wrap">
@@ -95,10 +128,16 @@ export default function ArchivedRetoursPage() {
           <Input placeholder="Rechercher..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
         </div>
         {isAdmin && selected.size > 0 && (
-          <Button variant="destructive" size="sm" onClick={() => setBulkDeleteOpen(true)}>
-            <Trash2 className="h-4 w-4 mr-1" />
-            Supprimer ({selected.size})
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setBulkRestoreOpen(true)}>
+              <RotateCcw className="h-4 w-4 mr-1" />
+              Restaurer ({selected.size})
+            </Button>
+            <Button variant="destructive" size="sm" onClick={() => setBulkDeleteOpen(true)}>
+              <Trash2 className="h-4 w-4 mr-1" />
+              Supprimer ({selected.size})
+            </Button>
+          </div>
         )}
       </div>
 
@@ -248,6 +287,28 @@ export default function ArchivedRetoursPage() {
             </DialogClose>
             <Button variant="destructive" disabled={bulkDeleting} onClick={handleBulkDelete}>
               {bulkDeleting ? "Suppression..." : `Supprimer ${selected.size} retour(s)`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={bulkRestoreOpen} onOpenChange={setBulkRestoreOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <RotateCcw className="h-5 w-5 text-primary" />
+              Restauration en masse
+            </DialogTitle>
+            <DialogDescription>
+              Vous allez restaurer {selected.size} retour(s) vers la liste active.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Annuler</Button>
+            </DialogClose>
+            <Button disabled={bulkRestoring} onClick={handleBulkRestore}>
+              {bulkRestoring ? "Restauration..." : `Restaurer ${selected.size} retour(s)`}
             </Button>
           </DialogFooter>
         </DialogContent>
