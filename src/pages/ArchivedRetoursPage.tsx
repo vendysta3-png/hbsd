@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useArchivedRetours, useRestoreRetour, usePermanentDeleteRetour } from "@/hooks/useRetours";
 import { useLogRetourAction } from "@/hooks/useRetourHistory";
 import { useAuth } from "@/hooks/useAuth";
-
 import RetourHistoryDialog from "@/components/RetourHistoryDialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ export default function ArchivedRetoursPage() {
   const restoreRetour = useRestoreRetour();
   const permanentDelete = usePermanentDeleteRetour();
   const logAction = useLogRetourAction();
-  const { isAdmin } = useAuth();
   const [search, setSearch] = useState("");
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [historyRetour, setHistoryRetour] = useState<any>(null);
@@ -82,27 +80,23 @@ export default function ArchivedRetoursPage() {
                         <Button variant="ghost" size="icon" onClick={() => setHistoryRetour(r)} title="Historique">
                           <History className="h-4 w-4 text-muted-foreground" />
                         </Button>
-                        {isAdmin && (
-                          <>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              title="Restaurer"
-                              onClick={() => {
-                                restoreRetour.mutate(r.id, {
-                                  onSuccess: () => {
-                                    logAction.mutate({ retour_id: r.id, action: "restauration", details: { expediteur: r.expediteur } });
-                                  },
-                                });
-                              }}
-                            >
-                              <RotateCcw className="h-4 w-4 text-primary" />
-                            </Button>
-                            <Button variant="ghost" size="icon" title="Supprimer définitivement" onClick={() => setDeleteConfirmId(r.id)}>
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </>
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Restaurer"
+                          onClick={() => {
+                            restoreRetour.mutate(r.id, {
+                              onSuccess: () => {
+                                logAction.mutate({ retour_id: r.id, action: "restauration", details: { expediteur: r.expediteur } });
+                              },
+                            });
+                          }}
+                        >
+                          <RotateCcw className="h-4 w-4 text-primary" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Supprimer définitivement" onClick={() => setDeleteConfirmId(r.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

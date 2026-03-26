@@ -7,7 +7,6 @@ import { format, differenceInDays } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Retour } from "@/hooks/useRetours";
-import { useAuth } from "@/hooks/useAuth";
 
 interface Props {
   retours: Retour[];
@@ -58,7 +57,6 @@ function DetailRow({ retour }: { retour: Retour }) {
 }
 
 export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdit, onDelete, onStatusChange, onShowHistory }: Props) {
-  const { isAdmin } = useAuth();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<PageSize>(15);
   const [expandedRowId, setExpandedRowId] = useState<string | null>(null);
@@ -151,11 +149,9 @@ export default function RetourTable({ retours, selectedRowId, onSelectRow, onEdi
                         <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onEdit(r); }}>
                           <Pencil className="h-4 w-4 text-primary" />
                         </Button>
-                        {isAdmin && (
-                          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(r.id); }}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        )}
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); onDelete(r.id); }}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
