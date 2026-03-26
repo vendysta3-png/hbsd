@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function ArchivedRetoursPage() {
+  const { isAdmin } = useAuth();
   const { data: archived = [], isLoading } = useArchivedRetours();
   const restoreRetour = useRestoreRetour();
   const permanentDelete = usePermanentDeleteRetour();
