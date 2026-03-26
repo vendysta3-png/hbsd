@@ -6,44 +6,71 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const jsonResponse = (body: Record<string, unknown>, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+
 serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
 
-    // Verify caller with a user-context client
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Non authentifié");
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
+      return jsonResponse({ error: "Configuration serveur invalide" }, 500);
+    }
+
+    const authHeader = req.headers.get("authorization") ?? req.headers.get("Authorization");
+    const bearerMatch = authHeader?.match(/^Bearer\s+(.+)$/i);
+    const token = bearerMatch?.[1]?.trim();
+
+    if (!token) {
+      return jsonResponse({ error: "Non authentifié" }, 401);
+    }
 
     const userClient = createClient(supabaseUrl, anonKey, {
-      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: { headers: { Authorization: `Bearer ${token}` } },
     });
 
-    const { data: { user: caller }, error: userError } = await userClient.auth.getUser();
-    if (userError || !caller) throw new Error("Non authentifié");
+    const { data: userData, error: userError } = await userClient.auth.getUser(token);
+    if (userError || !userData?.user) {
+      return jsonResponse({ error: "Non authentifié" }, 401);
+    }
 
-    // Admin client for privileged operations
-    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+    const callerId = userData.user.id;
+    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
 
-    const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: caller.id, _role: "admin" });
-    if (!isAdmin) throw new Error("Non autorisé");
+    const { data: isAdmin } = await adminClient.rpc("has_role", { _user_id: callerId, _role: "admin" });
+    if (!isAdmin) {
+      return jsonResponse({ error: "Non autorisé" }, 403);
+    }
 
     const { action, email, password, role, userId } = await req.json();
 
     if (action === "list") {
-      const { data: { users }, error } = await adminClient.auth.admin.listUsers();
+      const { data: usersResult, error } = await adminClient.auth.admin.listUsers();
       if (error) throw error;
-      const { data: roles } = await adminClient.from("user_roles").select("*");
+
+      const users = usersResult?.users ?? [];
+      const { data: roles } = await adminClient.from("user_roles").select("user_id, role");
+
       const enriched = users.map((u) => ({
         id: u.id,
         email: u.email,
         role: roles?.find((r) => r.user_id === u.id)?.role || "user",
         created_at: u.created_at,
       }));
-      return new Response(JSON.stringify({ users: enriched }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+      return jsonResponse({ users: enriched });
     }
 
     if (action === "create") {
@@ -53,32 +80,38 @@ serve(async (req) => {
         email_confirm: true,
       });
       if (error) throw error;
+
       if (role && role !== "user") {
         await adminClient.from("user_roles").insert({ user_id: newUser.user.id, role });
       }
-      return new Response(JSON.stringify({ user: newUser.user }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+      return jsonResponse({ user: newUser.user });
     }
 
     if (action === "update") {
-      const updates: any = {};
+      const updates: Record<string, string> = {};
       if (email) updates.email = email;
       if (password) updates.password = password;
+
       const { error } = await adminClient.auth.admin.updateUserById(userId, updates);
       if (error) throw error;
+
       if (role) {
         await adminClient.from("user_roles").upsert({ user_id: userId, role }, { onConflict: "user_id" });
       }
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+      return jsonResponse({ success: true });
     }
 
     if (action === "delete") {
       const { error } = await adminClient.auth.admin.deleteUser(userId);
       if (error) throw error;
-      return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+      return jsonResponse({ success: true });
     }
 
-    throw new Error("Action inconnue");
+    return jsonResponse({ error: "Action inconnue" }, 400);
   } catch (error: any) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return jsonResponse({ error: error?.message || "Erreur inattendue" }, 400);
   }
 });
