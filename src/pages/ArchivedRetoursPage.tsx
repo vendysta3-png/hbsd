@@ -291,6 +291,28 @@ export default function ArchivedRetoursPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={bulkRestoreOpen} onOpenChange={setBulkRestoreOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <RotateCcw className="h-5 w-5 text-primary" />
+              Restauration en masse
+            </DialogTitle>
+            <DialogDescription>
+              Vous allez restaurer {selected.size} retour(s) vers la liste active.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Annuler</Button>
+            </DialogClose>
+            <Button disabled={bulkRestoring} onClick={handleBulkRestore}>
+              {bulkRestoring ? "Restauration..." : `Restaurer ${selected.size} retour(s)`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
