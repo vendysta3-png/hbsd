@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
 export default function ArchivedRetoursPage() {
+  const { isAdmin } = useAuth();
   const { data: archived = [], isLoading } = useArchivedRetours();
   const restoreRetour = useRestoreRetour();
   const permanentDelete = usePermanentDeleteRetour();
@@ -80,23 +81,27 @@ export default function ArchivedRetoursPage() {
                         <Button variant="ghost" size="icon" onClick={() => setHistoryRetour(r)} title="Historique">
                           <History className="h-4 w-4 text-muted-foreground" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Restaurer"
-                          onClick={() => {
-                            restoreRetour.mutate(r.id, {
-                              onSuccess: () => {
-                                logAction.mutate({ retour_id: r.id, action: "restauration", details: { expediteur: r.expediteur } });
-                              },
-                            });
-                          }}
-                        >
-                          <RotateCcw className="h-4 w-4 text-primary" />
-                        </Button>
-                        <Button variant="ghost" size="icon" title="Supprimer définitivement" onClick={() => setDeleteConfirmId(r.id)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        {isAdmin && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              title="Restaurer"
+                              onClick={() => {
+                                restoreRetour.mutate(r.id, {
+                                  onSuccess: () => {
+                                    logAction.mutate({ retour_id: r.id, action: "restauration", details: { expediteur: r.expediteur } });
+                                  },
+                                });
+                              }}
+                            >
+                              <RotateCcw className="h-4 w-4 text-primary" />
+                            </Button>
+                            <Button variant="ghost" size="icon" title="Supprimer définitivement" onClick={() => setDeleteConfirmId(r.id)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
