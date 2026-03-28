@@ -1,0 +1,1 @@
+ALTER TABLE public.retours_colis DROP CONSTRAINT retours_colis_receptionniste_check;
