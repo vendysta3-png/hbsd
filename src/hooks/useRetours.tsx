@@ -85,15 +85,7 @@ export function useDeleteRetour() {
 export function useArchivedRetours() {
   return useQuery({
     queryKey: ["archived-retours"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("retours_colis")
-        .select("*")
-        .eq("archived", true)
-        .order("updated_at", { ascending: false });
-      if (error) throw error;
-      return data as Retour[];
-    },
+    queryFn: () => fetchAllRetours(true),
   });
 }
 
