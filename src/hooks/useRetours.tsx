@@ -5,18 +5,32 @@ import type { Tables, TablesInsert, TablesUpdate } from "@/integrations/supabase
 
 export type Retour = Tables<"retours_colis">;
 
+async function fetchAllRetours(archived: boolean): Promise<Retour[]> {
+  const PAGE_SIZE = 1000;
+  let allData: Retour[] = [];
+  let from = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from("retours_colis")
+      .select("*")
+      .eq("archived", archived)
+      .order("date_heure_saisie", { ascending: false })
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    allData = allData.concat(data as Retour[]);
+    hasMore = (data?.length ?? 0) === PAGE_SIZE;
+    from += PAGE_SIZE;
+  }
+
+  return allData;
+}
+
 export function useRetours() {
   return useQuery({
     queryKey: ["retours"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("retours_colis")
-        .select("*")
-        .eq("archived", false)
-        .order("date_heure_saisie", { ascending: false });
-      if (error) throw error;
-      return data as Retour[];
-    },
+    queryFn: () => fetchAllRetours(false),
   });
 }
 
