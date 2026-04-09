@@ -9,10 +9,10 @@ const stats = [
   { key: "today", label: "Récupéré aujourd'hui", icon: CalendarDays, color: "var(--stat-today)" },
 ];
 
-export default function StatsCards({ retours }: { retours: Retour[] }) {
+export default function StatsCards({ retours, totalAllRetours }: { retours: Retour[]; totalAllRetours?: number }) {
   const today = new Date().toDateString();
   const values: Record<string, number> = {
-    total: retours.length,
+    total: totalAllRetours ?? retours.length,
     disponible: retours.filter((r) => r.etat === "Disponible" || !r.etat).length,
     recupere: retours.filter((r) => r.etat === "Retour récupéré").length,
     today: retours.filter(
