@@ -35,7 +35,7 @@ export default function DashboardHome() {
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
         <p className="text-muted-foreground text-sm">Vue d'ensemble des retours de colis</p>
       </div>
-      <StatsCards retours={retours} />
+      <StatsCards retours={retours} totalAllRetours={totalAllRetours} />
 
       {overdueRetours.length > 0 && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/10">
