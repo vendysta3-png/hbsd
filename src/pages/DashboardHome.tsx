@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { useRetours } from "@/hooks/useRetours";
 import StatsCards from "@/components/StatsCards";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +12,16 @@ import { useNavigate } from "react-router-dom";
 
 export default function DashboardHome() {
   const { data: retours = [] } = useRetours();
+  const { data: totalAllRetours = 0 } = useQuery({
+    queryKey: ["retours-total-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("retours_colis")
+        .select("*", { count: "exact", head: true });
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
   const navigate = useNavigate();
   const [overdueExpanded, setOverdueExpanded] = useState(false);
   const recentRetours = retours.slice(0, 10);
@@ -23,7 +35,7 @@ export default function DashboardHome() {
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
         <p className="text-muted-foreground text-sm">Vue d'ensemble des retours de colis</p>
       </div>
-      <StatsCards retours={retours} />
+      <StatsCards retours={retours} totalAllRetours={totalAllRetours} />
 
       {overdueRetours.length > 0 && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/10">
