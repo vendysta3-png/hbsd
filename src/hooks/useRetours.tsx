@@ -12,7 +12,6 @@ export function useRetours() {
       const { data, error } = await supabase
         .from("retours_colis")
         .select("*")
-        .eq("archived", false)
         .order("date_heure_saisie", { ascending: false });
       if (error) throw error;
       return data as Retour[];
